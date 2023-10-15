@@ -14,6 +14,6 @@ public class HelloWorldControllerApi {
 
     @GetMapping("hello/{name}")
     public String hello(@PathVariable("name") String name) {
-        return "Welcome! [|=USER=|]!".replace("[|=USER=|]", name);
+        return "Welcome! NICE TO MEET YOU [|=USER=|]!".replace("[|=USER=|]", name);
     }
 }
