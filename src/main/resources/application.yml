@@ -1,7 +1,10 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://27.113.54.21:13306/friedkimchi
+    url: jdbc:mariadb://192.169.0.4:13306/friedkimchi
     username: root
     password: friedkimchi@qwerty
 
