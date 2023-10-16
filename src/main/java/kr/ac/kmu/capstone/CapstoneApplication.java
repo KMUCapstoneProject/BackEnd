@@ -1,13 +1,13 @@
-package com.kdedevelop.actuatortest;
+package kr.ac.kmu.capstone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ActuatorTestApplication {
+public class CapstoneApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ActuatorTestApplication.class, args);
+        SpringApplication.run(CapstoneApplication.class, args);
     }
 
 }

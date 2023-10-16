@@ -1,10 +1,10 @@
-package com.kdedevelop.actuatortest;
+package kr.ac.kmu.capstone;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ActuatorTestApplicationTests {
+class CapstoneApplicationTests {
 
     @Test
     void contextLoads() {
