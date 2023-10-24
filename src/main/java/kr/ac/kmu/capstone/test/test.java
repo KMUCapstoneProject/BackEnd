@@ -19,4 +19,9 @@ public class test {
 
         return "Hello World!";
     }
+    
+    @GetMapping("CD_CI_Test")
+    public String testHelloWorld() {
+        return "this is CD CI Test.";
+    }
 }
