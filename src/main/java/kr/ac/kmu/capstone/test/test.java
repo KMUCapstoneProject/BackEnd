@@ -21,7 +21,7 @@ public class test {
     }
     
     @GetMapping("CD_CI_Test")
-    public String testHelloWorld() {
+    public String cd_ci() {
         return "this is CD CI Test.";
     }
 }
