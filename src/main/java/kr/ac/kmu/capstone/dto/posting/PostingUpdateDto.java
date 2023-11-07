@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 public class PostingUpdateDto {
@@ -23,18 +24,18 @@ public class PostingUpdateDto {
     @Pattern(regexp = "^.{2,500}$", message = "글자수는 2자 이상 500자 이하로 작성해주세요")
     private String content;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private LocalDate startTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime startTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private LocalDate deadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime deadline;
 
     // 아이콘을 보여줄 위치 정보
     private Double latitude; // x
 
     private Double longitude; // y
 
-    public PostingUpdateDto(String title, String content, LocalDate startTime, LocalDate deadline, Double latitude, Double longitude) {
+    public PostingUpdateDto(String title, String content, LocalDateTime startTime, LocalDateTime deadline, Double latitude, Double longitude) {
         this.title = title;
         this.content = content;
         this.startTime = startTime;

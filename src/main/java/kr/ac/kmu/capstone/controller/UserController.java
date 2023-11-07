@@ -2,11 +2,9 @@ package kr.ac.kmu.Capstone.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import kr.ac.kmu.Capstone.dto.user.CheckPwDto;
-import kr.ac.kmu.Capstone.dto.user.LoginDto;
-import kr.ac.kmu.Capstone.dto.user.SignupDto;
-import kr.ac.kmu.Capstone.dto.user.UserUpdateDto;
+import kr.ac.kmu.Capstone.dto.user.*;
 import kr.ac.kmu.Capstone.entity.User;
+import kr.ac.kmu.Capstone.repository.UserRepository;
 import kr.ac.kmu.Capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +55,7 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDto loginDTO, HttpSession session){
+    public ResponseEntity login(@RequestBody LoginDto loginDTO/*, HttpSession session*/){
 
         String result = userService.loginUser(loginDTO);
         //login 실패
@@ -65,8 +63,8 @@ public class UserController {
             return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
         } else {
             //login 성공
-            session.setAttribute("email", result);
-            session.setMaxInactiveInterval(1800); // 60s * 30 (30분)
+            /*session.setAttribute("email", result);
+            session.setMaxInactiveInterval(1800); // 60s * 30 (30분)*/
 
             // user 객체
             User info = userService.getInfo(result);
@@ -92,8 +90,9 @@ public class UserController {
 
     // 비밀번호 확인
     @PostMapping("/checkPW")
-    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO, HttpSession session){
-        User info = userService.getUserBySession(session);
+    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO/*, HttpSession session*/){
+        //User info = userService.getUserBySession(session);
+        User info = userService.getUserInfo("test@ab.cd");
         boolean result = userService.comparePW(info, checkPwDTO.getPassword());
         if(result == false)
             return ResponseEntity.ok(HttpStatus.EXPECTATION_FAILED); //417
@@ -102,7 +101,7 @@ public class UserController {
         }
     }
 
-    // 회원정보 업데이트
+    // 회원정보 업데이트 (닉네임만)
     @PostMapping("/update")
     public ResponseEntity update(@Valid @RequestBody UserUpdateDto userRequestDto, BindingResult bindingResult){
         // nickname, password, email
@@ -117,6 +116,8 @@ public class UserController {
         User info = userService.getInfo(userRequestDto.getEmail());
         return ResponseEntity.ok(info);
     }
+
+
 
 
 }

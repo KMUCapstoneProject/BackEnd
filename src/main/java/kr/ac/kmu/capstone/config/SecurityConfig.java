@@ -27,9 +27,9 @@ public class SecurityConfig{
                 .authorizeRequests()
                 //.requestMatchers("/admin/**").hasRole("ADMIN")
                 //.requestMatchers("/api/**").hasAnyRole("USER1", "USER2")
+//                .requestMatchers("/**").permitAll()
                 .requestMatchers("/**").permitAll()
-//                .requestMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
                 .and().build();
     }
 

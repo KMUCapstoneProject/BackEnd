@@ -1,9 +1,11 @@
 package kr.ac.kmu.Capstone.dto.posting;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
+@Getter
 @Builder
 public class PostingContentResponseDto {
 

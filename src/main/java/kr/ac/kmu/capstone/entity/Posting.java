@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -34,9 +35,9 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
     @Column(nullable = false, length = 500)
     private String content;
 
-    private LocalDate startTime; // start date가 나을까,,?
+    private LocalDateTime startTime; // start date가 나을까,,?
 
-    private LocalDate deadline;
+    private LocalDateTime deadline;
 
     private int postHits; //조회수
 
@@ -51,7 +52,7 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
 
 
     @Builder
-    public Posting(Long postId, User user, Category category, String title, String content, LocalDate startTime, LocalDate deadline, int postHits, Double latitude, Double longitude) {
+    public Posting(Long postId, User user, Category category, String title, String content, LocalDateTime startTime, LocalDateTime deadline, int postHits, Double latitude, Double longitude) {
         this.postId = postId;
         this.user = user;
         this.category = category;
@@ -82,11 +83,11 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
         this.postHits = postHits;
     }
 
-    public void setStartTime(LocalDate startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public void setDeadline(LocalDate deadline) {
+    public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
     }
 

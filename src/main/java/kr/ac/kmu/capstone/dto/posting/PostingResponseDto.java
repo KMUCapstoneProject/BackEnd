@@ -1,10 +1,13 @@
 package kr.ac.kmu.Capstone.dto.posting;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+@Getter
 @Builder
 public class PostingResponseDto {
 
@@ -13,7 +16,7 @@ public class PostingResponseDto {
     private Long userId;
     private String nickname;
     private String title;
-    private LocalDate deadline;
+    private LocalDateTime deadline;
     private int postHits;
 
 

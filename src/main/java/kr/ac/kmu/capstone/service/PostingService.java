@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -31,10 +32,25 @@ public class PostingService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    @Transactional
+    /*@Transactional
     public Posting save(Long categoryId, PostingSaveDto postingSaveDto, HttpSession session) {
 
         User newuser = getInfo(session);
+        Category newCategory = makeTempCategory(categoryId);
+
+        Posting newPosting = postingSaveDto.toEntity(newuser, newCategory);
+        return postingRepository.save(newPosting);
+    }*/
+
+    public User getUserInfo(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get();
+    }
+
+    @Transactional
+    public Posting save(Long categoryId, PostingSaveDto postingSaveDto) {
+
+        User newuser = getUserInfo("test@ab.cd");
         Category newCategory = makeTempCategory(categoryId);
 
         Posting newPosting = postingSaveDto.toEntity(newuser, newCategory);
@@ -118,7 +134,7 @@ public class PostingService {
 
 
     public void checkDeadline(Posting posting) {
-        LocalDate currentdate = LocalDate.now();
+        LocalDateTime currentdate = LocalDateTime.now();
 
         if (posting.getDeadline().compareTo(currentdate) < 0) { // 데드라인이 지났을 경우
             delete(posting.getPostId());

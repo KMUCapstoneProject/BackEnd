@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,11 @@ public class UserService {
     private final UserRepository userRepository;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public User getUserInfo(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        return user.get();
+    }
 
     public User joinUser(SignupDto signupDTO){
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
@@ -74,6 +81,8 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
         return user.get();
     }
+
+
 
 
     public boolean comparePW(User user, String checkPW){

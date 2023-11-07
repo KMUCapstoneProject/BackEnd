@@ -26,6 +26,13 @@ public class PostingController {
 
     private PostingService postingService;
 
+    // 전체 게시물 리스트
+    @GetMapping("/list")
+    public List<PostingResponseDto> postingList0() {
+        postingService.refresh(); // 데드라인 지난 게시물 삭제
+        return postingService.allPostingList();
+    }
+
     // 카테고리별 게시물 리스트
     @GetMapping("/list/{categoryId}")
     public List<PostingResponseDto> postingList(@PathVariable Long categoryId) {
@@ -47,7 +54,7 @@ public class PostingController {
 
     // 게시물 추가
     @PostMapping("/add/{categoryId}")
-    public ResponseEntity save(@PathVariable Long categoryId, @Valid @RequestBody PostingSaveDto postingSaveDto, HttpSession session, BindingResult bindingResult) {
+    public ResponseEntity save(@PathVariable Long categoryId, @Valid @RequestBody PostingSaveDto postingSaveDto/*, HttpSession session*/, BindingResult bindingResult) {
         //categoryId, title, content, startTime, deadline, latitude, longitude), session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -55,7 +62,7 @@ public class PostingController {
                 return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
         }
-        postingService.save(categoryId, postingSaveDto, session);
+        postingService.save(categoryId, postingSaveDto);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -69,7 +76,7 @@ public class PostingController {
 
     // 게시물 내용 변경
     @PostMapping("/{postId}/edit")
-    public ResponseEntity edit(@PathVariable Long postId, @Valid @RequestBody PostingUpdateDto posting, HttpSession session, BindingResult bindingResult) {
+    public ResponseEntity edit(@PathVariable Long postId, @Valid @RequestBody PostingUpdateDto posting/*, HttpSession session*/, BindingResult bindingResult) {
         // postId, categoryId, title, content, startTime, deadline, latitude, longitude, session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -78,9 +85,9 @@ public class PostingController {
             }
         }
 
-        if (!postingService.checkUser(postId, session)) {
+        /*if (!postingService.checkUser(postId, session)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        }*/
         postingService.update(postId, posting);
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -88,11 +95,11 @@ public class PostingController {
 
     // 게시물 삭제
     @GetMapping("/{postId}/delete")
-    public ResponseEntity deleteById(@PathVariable Long postId, HttpSession session) {
+    public ResponseEntity deleteById(@PathVariable Long postId/*, HttpSession session*/) {
 
-        if (!postingService.checkUser(postId, session)) {
+        /*if (!postingService.checkUser(postId, session)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        }*/
 
         postingService.delete(postId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
