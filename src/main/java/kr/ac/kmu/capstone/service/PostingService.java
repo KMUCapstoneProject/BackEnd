@@ -1,10 +1,7 @@
 package kr.ac.kmu.Capstone.service;
 
 import jakarta.servlet.http.HttpSession;
-import kr.ac.kmu.Capstone.dto.posting.PostingContentResponseDto;
-import kr.ac.kmu.Capstone.dto.posting.PostingResponseDto;
-import kr.ac.kmu.Capstone.dto.posting.PostingSaveDto;
-import kr.ac.kmu.Capstone.dto.posting.PostingUpdateDto;
+import kr.ac.kmu.Capstone.dto.posting.*;
 import kr.ac.kmu.Capstone.entity.Category;
 import kr.ac.kmu.Capstone.entity.Posting;
 import kr.ac.kmu.Capstone.entity.User;
@@ -70,9 +67,18 @@ public class PostingService {
         posting.setDeadline(updateParam.getDeadline());
         posting.setLatitude(updateParam.getLatitude());
         posting.setLongitude(updateParam.getLongitude());
+        posting.setStatus(1); // 업데이트 대기
         postingRepository.save(posting);
     }
-    
+
+    @Transactional
+    public void adminStatusUpdate(Long postId) {
+
+        Posting posting = makeTempPosting(postId);
+        posting.setStatus(2); // 등록
+        postingRepository.save(posting);
+    }
+
     public void updatePostHits(Long postId) {
 
         Posting posting = makeTempPosting(postId);
@@ -85,6 +91,22 @@ public class PostingService {
 
         Optional<Posting> posting = postingRepository.findById(postId);
 
+        DateTime startTime = DateTime.builder()
+                .year(posting.get().getStartTime().getYear())
+                .month(posting.get().getStartTime().getMonthValue())
+                .day(posting.get().getStartTime().getDayOfMonth())
+                .hour(posting.get().getStartTime().getHour())
+                .minute(posting.get().getStartTime().getMinute())
+                .build();
+
+        DateTime dealine = DateTime.builder()
+                .year(posting.get().getDeadline().getYear())
+                .month(posting.get().getDeadline().getMonthValue())
+                .day(posting.get().getDeadline().getDayOfMonth())
+                .hour(posting.get().getDeadline().getHour())
+                .minute(posting.get().getDeadline().getMinute())
+                .build();
+
         Optional<PostingContentResponseDto> postingResponse = Optional.ofNullable(PostingContentResponseDto.builder()
                 .postId(posting.get().getPostId())
                 .userId(posting.get().getUser().getId())
@@ -92,6 +114,8 @@ public class PostingService {
                 .nickname(posting.get().getUser().getNickname())
                 .title(posting.get().getTitle())
                 .content(posting.get().getContent())
+                .startTime(startTime)
+                .deadline(dealine)
                 .postHits(posting.get().getPostHits() + 1) // 조회수 1 증가
                 .latitude(posting.get().getLatitude())
                 .longitude(posting.get().getLongitude())
@@ -165,7 +189,7 @@ public class PostingService {
     }
 
 
-    // 글 목록
+    // 글 목록(카테고리)
     public List<PostingResponseDto> postingList(Long categoryId) {
 
         if (categoryId == 0) {
@@ -179,8 +203,23 @@ public class PostingService {
         return postingResponse;
     }
 
+    // 어드민에서 모든 포스팅 리스트로 가져오게 하는 것
+    public List<PostingContentResponseDto> allPostingsinAdmin() {
+        List<Posting> postings = postingRepository.findAll();
+        return postingListtoPostingContentResponseList(postings);
+    }
 
+    // 등록 대기 포스팅만 가져오기
+    public List<PostingContentResponseDto> waiting0PostingsinAdmin() {
+        List<Posting> postings = postingRepository.findByStatus(0);
+        return postingListtoPostingContentResponseList(postings);
+    }
 
+    // 업데이트 대기 포스팅만 가져오기
+    public List<PostingContentResponseDto> waiting1PostingsinAdmin() {
+        List<Posting> postings = postingRepository.findByStatus(1);
+        return postingListtoPostingContentResponseList(postings);
+    }
 
 
     private User getInfo(HttpSession session){
@@ -211,13 +250,24 @@ public class PostingService {
 
         List<PostingResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
+
+            //deadline 년, 월, 일, 시, 분
+            DateTime dealine = DateTime.builder()
+                    .year(posting.getDeadline().getYear())
+                    .month(posting.getDeadline().getMonthValue())
+                    .day(posting.getDeadline().getDayOfMonth())
+                    .hour(posting.getDeadline().getHour())
+                    .minute(posting.getDeadline().getMinute())
+                    .build();
+
             PostingResponseDto postingResponseDto = PostingResponseDto.builder()
                     .postId(posting.getPostId())
                     .categoryId(posting.getCategory().getCategoryId())
                     .userId(posting.getUser().getId())
                     .nickname(posting.getUser().getNickname())
                     .title(posting.getTitle())
-                    .deadline(posting.getDeadline())
+                    //.deadline(posting.getDeadline())
+                    .deadline(dealine)
                     .postHits(posting.getPostHits())
                     .build();
 
@@ -227,12 +277,31 @@ public class PostingService {
     }
 
 
-/*
+
+
+
     private List<PostingContentResponseDto> postingListtoPostingContentResponseList(List<Posting> postings){
 
-        Collections.reverse(postings);
+        //Collections.reverse(postings);
         List<PostingContentResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
+
+            DateTime startTime = DateTime.builder()
+                    .year(posting.getStartTime().getYear())
+                    .month(posting.getStartTime().getMonthValue())
+                    .day(posting.getStartTime().getDayOfMonth())
+                    .hour(posting.getStartTime().getHour())
+                    .minute(posting.getStartTime().getMinute())
+                    .build();
+
+            DateTime dealine = DateTime.builder()
+                    .year(posting.getDeadline().getYear())
+                    .month(posting.getDeadline().getMonthValue())
+                    .day(posting.getDeadline().getDayOfMonth())
+                    .hour(posting.getDeadline().getHour())
+                    .minute(posting.getDeadline().getMinute())
+                    .build();
+
             PostingContentResponseDto postingContentResponseDto = PostingContentResponseDto.builder()
                     .postId(posting.getPostId())
                     .categoryId(posting.getCategory().getCategoryId())
@@ -240,8 +309,8 @@ public class PostingService {
                     .nickname(posting.getUser().getNickname())
                     .title(posting.getTitle())
                     .content(posting.getContent())
-                    .startTime(posting.getStartTime())
-                    .deadline(posting.getDeadline())
+                    .startTime(startTime)
+                    .deadline(dealine)
                     .postHits(posting.getPostHits())
                     .latitude(posting.getLatitude())
                     .longitude(posting.getLongitude())
@@ -251,6 +320,6 @@ public class PostingService {
         }
         return postingResponseList;
     }
-*/
+
 
 }

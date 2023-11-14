@@ -41,6 +41,8 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
 
     private int postHits; //조회수
 
+    private int status; // 0: 등록대기, 1: 업데이트 대기, 2: 등록
+
     // 아이콘을 보여줄 위치 정보
     // 따로따로? 아니면 건물별? -> 나중에 수정
     @Column(nullable = false, length = 500)
@@ -50,9 +52,8 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
     private Double longitude; // y
 
 
-
     @Builder
-    public Posting(Long postId, User user, Category category, String title, String content, LocalDateTime startTime, LocalDateTime deadline, int postHits, Double latitude, Double longitude) {
+    public Posting(Long postId, User user, Category category, String title, String content, LocalDateTime startTime, LocalDateTime deadline, int postHits, int status, Double latitude, Double longitude) {
         this.postId = postId;
         this.user = user;
         this.category = category;
@@ -61,6 +62,7 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
         this.startTime = startTime;
         this.deadline = deadline;
         this.postHits = postHits;
+        this.status = status;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -83,13 +85,18 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
         this.postHits = postHits;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+        this.startTime = this.startTime.with(startTime);
     }
 
     public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
+        this.deadline = this.deadline.with(deadline);
     }
+
 
     public void setLatitude(Double latitude) {
         this.latitude = latitude;

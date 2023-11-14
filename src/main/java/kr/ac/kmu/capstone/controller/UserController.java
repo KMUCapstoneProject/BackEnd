@@ -4,13 +4,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import kr.ac.kmu.Capstone.dto.user.*;
 import kr.ac.kmu.Capstone.entity.User;
-import kr.ac.kmu.Capstone.repository.UserRepository;
 import kr.ac.kmu.Capstone.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +17,7 @@ import java.util.List;
 
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/api")
 @AllArgsConstructor
 public class UserController {
@@ -48,8 +46,8 @@ public class UserController {
 
     // 중복가입 확인
     // True -> 중복, False -> 중복x
-    @GetMapping("/join/{email}/exists")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@PathVariable String email){
+    @GetMapping("/join/exists")
+    public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam("email") String email){
         return ResponseEntity.ok(userService.checkEmailDuplicate(email));
     }
 
@@ -90,9 +88,8 @@ public class UserController {
 
     // 비밀번호 확인
     @PostMapping("/checkPW")
-    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO/*, HttpSession session*/){
-        //User info = userService.getUserBySession(session);
-        User info = userService.getUserInfo("test@ab.cd");
+    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO, HttpSession session){
+        User info = userService.getUserBySession(session);
         boolean result = userService.comparePW(info, checkPwDTO.getPassword());
         if(result == false)
             return ResponseEntity.ok(HttpStatus.EXPECTATION_FAILED); //417
@@ -101,7 +98,7 @@ public class UserController {
         }
     }
 
-    // 회원정보 업데이트 (닉네임만)
+    // 회원정보 업데이트
     @PostMapping("/update")
     public ResponseEntity update(@Valid @RequestBody UserUpdateDto userRequestDto, BindingResult bindingResult){
         // nickname, password, email
@@ -117,7 +114,10 @@ public class UserController {
         return ResponseEntity.ok(info);
     }
 
-
-
+    // 모든 유저 리스트
+    @GetMapping("/allUserList")
+    public List<UserResponseDto> allUserList() {
+        return userService.getAllUserInfo();
+    }
 
 }

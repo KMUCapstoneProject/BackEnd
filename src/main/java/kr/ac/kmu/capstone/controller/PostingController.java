@@ -19,33 +19,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/api/posting")
 @AllArgsConstructor
 public class PostingController {
 
     private PostingService postingService;
 
-    // 전체 게시물 리스트
+    /*// 전체 게시물 리스트
     @GetMapping("/list")
     public List<PostingResponseDto> postingList0() {
         postingService.refresh(); // 데드라인 지난 게시물 삭제
         return postingService.allPostingList();
-    }
+    }*/
 
     // 카테고리별 게시물 리스트
-    @GetMapping("/list/{categoryId}")
-    public List<PostingResponseDto> postingList(@PathVariable Long categoryId) {
+    @GetMapping("/list")
+    public List<PostingResponseDto> postingList(@RequestParam("categoryId") Long categoryId) { // @PathVariable 이 MethodArgumentTypeMismatchException 에러 계속나서 @RequestParam 으로 바꿈
         postingService.refresh(); // 데드라인 지난 게시물 삭제
+        log.info(String.valueOf(categoryId));
         return postingService.postingList(categoryId);
     }
 
     // 검색된 게시물 리스트
-    @GetMapping("/search/{categoryId}")
-    public ResponseEntity search(@RequestBody String keyword, @RequestBody String categoryId){
+    @GetMapping("/search")
+    public ResponseEntity search(@RequestParam("keyword") String keyword, @RequestParam("categoryId") Long categoryId){
         postingService.refresh();
-        Long newcategoryId = Long.parseLong(categoryId);
-        List<PostingResponseDto> searchList = postingService.search(keyword, newcategoryId);
+        List<PostingResponseDto> searchList = postingService.search(keyword, categoryId);
         if (searchList == null) {
             return new ResponseEntity(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
         }
@@ -53,8 +53,8 @@ public class PostingController {
     }
 
     // 게시물 추가
-    @PostMapping("/add/{categoryId}")
-    public ResponseEntity save(@PathVariable Long categoryId, @Valid @RequestBody PostingSaveDto postingSaveDto/*, HttpSession session*/, BindingResult bindingResult) {
+    @PostMapping("/add")
+    public ResponseEntity save(@RequestParam("categoryId") Long categoryId, @Valid @RequestBody PostingSaveDto postingSaveDto/*, HttpSession session*/, BindingResult bindingResult) {
         //categoryId, title, content, startTime, deadline, latitude, longitude), session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -62,21 +62,21 @@ public class PostingController {
                 return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
         }
-        postingService.save(categoryId, postingSaveDto);
+        postingService.save(categoryId, postingSaveDto/*, session*/);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
     // 게시물 내용 확인
-    @GetMapping("/{postId}")
-    public ResponseEntity findById(@PathVariable Long postId) {
+    @GetMapping("/view")
+    public ResponseEntity findById(@RequestParam("postId") Long postId) {
         PostingContentResponseDto posting = postingService.content(postId);
         postingService.updatePostHits(postId);
         return new ResponseEntity(posting, HttpStatus.OK);
     }
 
     // 게시물 내용 변경
-    @PostMapping("/{postId}/edit")
-    public ResponseEntity edit(@PathVariable Long postId, @Valid @RequestBody PostingUpdateDto posting/*, HttpSession session*/, BindingResult bindingResult) {
+    @PostMapping("/edit")
+    public ResponseEntity edit(@RequestParam("postId") Long postId, @Valid @RequestBody PostingUpdateDto posting, /*HttpSession session,*/ BindingResult bindingResult) {
         // postId, categoryId, title, content, startTime, deadline, latitude, longitude, session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -88,14 +88,15 @@ public class PostingController {
         /*if (!postingService.checkUser(postId, session)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }*/
+        log.info(String.valueOf(posting.getStartTime()));
         postingService.update(postId, posting);
         return new ResponseEntity(HttpStatus.OK);
     }
 
 
     // 게시물 삭제
-    @GetMapping("/{postId}/delete")
-    public ResponseEntity deleteById(@PathVariable Long postId/*, HttpSession session*/) {
+    @GetMapping("/delete")
+    public ResponseEntity deleteById(@RequestParam("postId") Long postId/*, HttpSession session*/) {
 
         /*if (!postingService.checkUser(postId, session)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

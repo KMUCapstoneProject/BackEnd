@@ -3,6 +3,7 @@ package kr.ac.kmu.Capstone.service;
 import jakarta.servlet.http.HttpSession;
 import kr.ac.kmu.Capstone.dto.user.LoginDto;
 import kr.ac.kmu.Capstone.dto.user.SignupDto;
+import kr.ac.kmu.Capstone.dto.user.UserResponseDto;
 import kr.ac.kmu.Capstone.dto.user.UserUpdateDto;
 import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.repository.UserRepository;
@@ -82,7 +83,22 @@ public class UserService {
         return user.get();
     }
 
+    public List<UserResponseDto> getAllUserInfo() {
+        List<User> userList = userRepository.findAll();
+        List<UserResponseDto> userDtoList = new ArrayList<>();
+        for (User user : userList) {
+            UserResponseDto userResponseDto = UserResponseDto.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .role(user.getRoleKey())
+                    .build();
 
+            //log.info(String.valueOf(user.getId()));
+            userDtoList.add(userResponseDto);
+        }
+        return userDtoList;
+    }
 
 
     public boolean comparePW(User user, String checkPW){

@@ -2,9 +2,8 @@ package kr.ac.kmu.Capstone.dto.posting;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,7 +15,8 @@ public class PostingResponseDto {
     private Long userId;
     private String nickname;
     private String title;
-    private LocalDateTime deadline;
+    //private LocalDateTime deadline; // "2023-11-22T01:01:00"
+    private DateTime deadline;  // "deadline": {"year": 2023,"month": 11,"day": 22,"hour": 1,"minute": 1}
     private int postHits;
 
 

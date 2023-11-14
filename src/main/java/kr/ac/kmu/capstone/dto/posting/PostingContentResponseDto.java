@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -15,8 +16,10 @@ public class PostingContentResponseDto {
     private String nickname;
     private String title;
     private String content;
-    private LocalDate startTime;
-    private LocalDate deadline;
+    //private LocalDateTime startTime;
+    //private LocalDateTime deadline;
+    private DateTime startTime;
+    private DateTime deadline;
     private int postHits;
     private Double latitude;
     private Double longitude;

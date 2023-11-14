@@ -33,6 +33,7 @@ public class PostingSaveDto {
     private LocalDateTime deadline;
 
     private int postHits; //조회수
+    private int status;
 
     // 아이콘을 보여줄 위치 정보
     private Double latitude; // x
@@ -49,6 +50,7 @@ public class PostingSaveDto {
                 .startTime(startTime)
                 .deadline(deadline)
                 .postHits(0)
+                .status(0) // 등록대기
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
