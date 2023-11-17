@@ -41,7 +41,15 @@ public class User {
         this.nickname = nickname;
     }
 
+    public void setRoles(Role roles) {
+        this.roles = roles;
+    }
+
     public String getRoleKey() {
-        return this.roles.getKey();
+        return this.roles.name();
+    }
+
+    public Role getRoles() {
+        return roles;
     }
 }

@@ -2,15 +2,18 @@ package kr.ac.kmu.Capstone.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
 import kr.ac.kmu.Capstone.dto.posting.PostingContentResponseDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingResponseDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingSaveDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingUpdateDto;
+import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.service.PostingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -26,26 +29,23 @@ public class PostingController {
 
     private PostingService postingService;
 
-    /*// 전체 게시물 리스트
+    // 카테고리별 게시물 리스트 // 0은 전체
     @GetMapping("/list")
-    public List<PostingResponseDto> postingList0() {
+    public List<PostingResponseDto> postingList(@RequestParam Long categoryId) { // @PathVariable 이 MethodArgumentTypeMismatchException 에러 계속나서 @RequestParam 으로 바꿈
         postingService.refresh(); // 데드라인 지난 게시물 삭제
-        return postingService.allPostingList();
-    }*/
-
-    // 카테고리별 게시물 리스트
-    @GetMapping("/list")
-    public List<PostingResponseDto> postingList(@RequestParam("categoryId") Long categoryId) { // @PathVariable 이 MethodArgumentTypeMismatchException 에러 계속나서 @RequestParam 으로 바꿈
-        postingService.refresh(); // 데드라인 지난 게시물 삭제
-        log.info(String.valueOf(categoryId));
+        //log.info(String.valueOf(categoryId));
         return postingService.postingList(categoryId);
     }
 
+    // 수정중
     // 검색된 게시물 리스트
     @GetMapping("/search")
-    public ResponseEntity search(@RequestParam("keyword") String keyword, @RequestParam("categoryId") Long categoryId){
+    public ResponseEntity search(@RequestParam String keyword, @RequestParam String categoryId){
         postingService.refresh();
-        List<PostingResponseDto> searchList = postingService.search(keyword, categoryId);
+        // 값이 안들어옴 수정필요
+        log.info(String.valueOf(categoryId));
+
+        List<PostingResponseDto> searchList = postingService.search(keyword, Long.parseLong(categoryId));
         if (searchList == null) {
             return new ResponseEntity(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
         }
@@ -54,7 +54,7 @@ public class PostingController {
 
     // 게시물 추가
     @PostMapping("/add")
-    public ResponseEntity save(@RequestParam("categoryId") Long categoryId, @Valid @RequestBody PostingSaveDto postingSaveDto/*, HttpSession session*/, BindingResult bindingResult) {
+    public ResponseEntity save(@Valid @RequestBody PostingSaveDto postingSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
         //categoryId, title, content, startTime, deadline, latitude, longitude), session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -62,7 +62,8 @@ public class PostingController {
                 return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
         }
-        postingService.save(categoryId, postingSaveDto/*, session*/);
+        User user = customUserDetails.getUser();
+        postingService.save(postingSaveDto, user);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
@@ -76,7 +77,7 @@ public class PostingController {
 
     // 게시물 내용 변경
     @PostMapping("/edit")
-    public ResponseEntity edit(@RequestParam("postId") Long postId, @Valid @RequestBody PostingUpdateDto posting, /*HttpSession session,*/ BindingResult bindingResult) {
+    public ResponseEntity edit(@Valid @RequestBody PostingUpdateDto posting, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
         // postId, categoryId, title, content, startTime, deadline, latitude, longitude, session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -85,22 +86,24 @@ public class PostingController {
             }
         }
 
-        /*if (!postingService.checkUser(postId, session)) {
+        User user = customUserDetails.getUser();
+        if (!postingService.checkUser(posting.getPostId(), user)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }*/
-        log.info(String.valueOf(posting.getStartTime()));
-        postingService.update(postId, posting);
+        }
+
+        postingService.update(posting);
         return new ResponseEntity(HttpStatus.OK);
     }
 
 
     // 게시물 삭제
     @GetMapping("/delete")
-    public ResponseEntity deleteById(@RequestParam("postId") Long postId/*, HttpSession session*/) {
+    public ResponseEntity deleteById(@RequestParam("postId") Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        /*if (!postingService.checkUser(postId, session)) {
+        User user = customUserDetails.getUser();
+        if (!postingService.checkUser(postId, user)) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }*/
+        }
 
         postingService.delete(postId);
         return new ResponseEntity(HttpStatus.ACCEPTED);

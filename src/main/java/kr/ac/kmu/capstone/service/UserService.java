@@ -5,6 +5,8 @@ import kr.ac.kmu.Capstone.dto.user.LoginDto;
 import kr.ac.kmu.Capstone.dto.user.SignupDto;
 import kr.ac.kmu.Capstone.dto.user.UserResponseDto;
 import kr.ac.kmu.Capstone.dto.user.UserUpdateDto;
+import kr.ac.kmu.Capstone.entity.Posting;
+import kr.ac.kmu.Capstone.entity.Role;
 import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,31 +38,18 @@ public class UserService {
         return userRepository.save(signupDTO.toEntity());
     }
 
-    public User getUserBySession(HttpSession session){
-        String email = (String) session.getAttribute("email");
-        return userRepository.findByEmail(email).get();
+    public boolean checkUser(String email, User user) {
+
+        if (email == user.getEmail()) {
+            return true;
+        }
+        return false;
     }
 
     public Boolean checkEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
-
-
-    public String loginUser(LoginDto loginDTO){
-        User findUser = userRepository.findByEmail(loginDTO.getEmail()).get();
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        if(findUser == null){
-            return "false";
-        }
-
-        if(!passwordEncoder.matches(loginDTO.getPassword(), findUser.getPassword())){
-            return "false";
-        }
-
-        return findUser.getEmail();
-    }
-
+    
     @Transactional
     public void update(UserUpdateDto dto){
 
@@ -76,6 +65,18 @@ public class UserService {
             String encodePW = passwordEncoder.encode(dto.getPassword());
             user.update(encodePW, dto.getNickname());
         }
+    }
+
+    @Transactional
+    public void updateStatusToManager(String email) {
+        User user = getInfo(email);
+        user.setRoles(Role.MANAGER);
+    }
+
+    @Transactional
+    public void updateStatusToAdmin(String email) {
+        User user = getInfo(email);
+        user.setRoles(Role.ADMIN);
     }
 
     public User getInfo(String email){

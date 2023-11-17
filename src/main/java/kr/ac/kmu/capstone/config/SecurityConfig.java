@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,17 +20,28 @@ public class SecurityConfig{
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
+        http
                 .csrf().disable()
-                .cors().configurationSource(corsConfigurationSource())
-                .and()
+                .cors().configurationSource(corsConfigurationSource());
+
+        http
+                .formLogin()// form data의 key value
+                .loginProcessingUrl("/api/login") // usercontroller의 login 대신. 자동 생성
+                .passwordParameter("password")
+                .usernameParameter("email")
+                .defaultSuccessUrl("/api/info", false);
+        http
+                .logout()
+                .logoutUrl("/api/logout");
+        http
                 .authorizeRequests()
-                //.requestMatchers("/admin/**").hasRole("ADMIN")
-                //.requestMatchers("/api/**").hasAnyRole("USER1", "USER2")
-//                .requestMatchers("/**").permitAll()
-                .requestMatchers("/**").permitAll()
-//                .anyRequest().authenticated()
-                .and().build();
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                //.requestMatchers("/api/**").hasAnyRole("MANAGER", "USER")
+                //.requestMatchers("/**").permitAll()
+//                .requestMatchers("/api/**").permitAll()
+                .anyRequest().permitAll();
+
+        return http.build();
     }
 
     @Bean
@@ -47,7 +58,7 @@ public class SecurityConfig{
     }
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
 }

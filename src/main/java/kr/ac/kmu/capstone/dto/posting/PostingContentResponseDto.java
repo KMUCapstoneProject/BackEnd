@@ -18,8 +18,10 @@ public class PostingContentResponseDto {
     private String content;
     //private LocalDateTime startTime;
     //private LocalDateTime deadline;
-    private DateTime startTime;
-    private DateTime deadline;
+    private String startTime;
+    private String deadline;
+    //private DateTime startTime;
+    //private DateTime deadline;
     private int postHits;
     private Double latitude;
     private Double longitude;

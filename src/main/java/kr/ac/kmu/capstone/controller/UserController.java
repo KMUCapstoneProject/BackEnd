@@ -2,6 +2,7 @@ package kr.ac.kmu.Capstone.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
 import kr.ac.kmu.Capstone.dto.user.*;
 import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.service.UserService;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -46,51 +48,28 @@ public class UserController {
 
     // 중복가입 확인
     // True -> 중복, False -> 중복x
-    @GetMapping("/join/exists")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam("email") String email){
+    @GetMapping("/join/{email}/exists")
+    public ResponseEntity<Boolean> checkEmailDuplicate(@PathVariable("email") String email){
         return ResponseEntity.ok(userService.checkEmailDuplicate(email));
     }
 
     // 로그인
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDto loginDTO/*, HttpSession session*/){
-
-        String result = userService.loginUser(loginDTO);
-        //login 실패
-        if(result == "false"){
-            return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
-        } else {
-            //login 성공
-            /*session.setAttribute("email", result);
-            session.setMaxInactiveInterval(1800); // 60s * 30 (30분)*/
-
-            // user 객체
-            User info = userService.getInfo(result);
-            return ResponseEntity.ok(info);
-        }
-    }
-
     // 로그아웃
-    @GetMapping("/logout")
-    public ResponseEntity logout(HttpSession session){
-        if(session!=null){
-            session.invalidate(); // 세션 삭제
-        }
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
+    // security에서 제공
+
 
     // 회원정보
-    @GetMapping("/info")
-    public ResponseEntity getInfo(HttpSession session){
-        User info = userService.getUserBySession(session);
+    @GetMapping("/info") // good!
+    public ResponseEntity getInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        User info = customUserDetails.getUser();
         return ResponseEntity.ok(info);
     }
 
-    // 비밀번호 확인
+    // 비밀번호 확인 // 별도의 버튼 있어서 따로. 별도의 update 같은걸로 api 만들기. 회원에 같이 안 넣고
     @PostMapping("/checkPW")
-    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO, HttpSession session){
-        User info = userService.getUserBySession(session);
-        boolean result = userService.comparePW(info, checkPwDTO.getPassword());
+    public ResponseEntity checkPW(@RequestBody CheckPwDto checkPwDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        User user = customUserDetails.getUser();
+        boolean result = userService.comparePW(user, checkPwDTO.getPassword());
         if(result == false)
             return ResponseEntity.ok(HttpStatus.EXPECTATION_FAILED); //417
         else {
@@ -100,7 +79,7 @@ public class UserController {
 
     // 회원정보 업데이트
     @PostMapping("/update")
-    public ResponseEntity update(@Valid @RequestBody UserUpdateDto userRequestDto, BindingResult bindingResult){
+    public ResponseEntity update(@Valid @RequestBody UserUpdateDto userRequestDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult){
         // nickname, password, email
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -109,15 +88,14 @@ public class UserController {
             }
         }
 
-        userService.update(userRequestDto);
-        User info = userService.getInfo(userRequestDto.getEmail());
-        return ResponseEntity.ok(info);
-    }
+        // 본인 확인
+        User user = customUserDetails.getUser();
+        if (!userService.checkUser(userRequestDto.getEmail(), user)) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
 
-    // 모든 유저 리스트
-    @GetMapping("/allUserList")
-    public List<UserResponseDto> allUserList() {
-        return userService.getAllUserInfo();
+        userService.update(userRequestDto);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 }

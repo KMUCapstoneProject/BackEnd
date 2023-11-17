@@ -12,6 +12,8 @@ public class PostingUpdateDto {
 
     // posthits 제외하고
 
+    private Long postId;
+
     private Long categoryId;
 
     @NotBlank(message = "제목을 입력해주세요")

@@ -29,35 +29,19 @@ public class PostingService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    /*@Transactional
-    public Posting save(Long categoryId, PostingSaveDto postingSaveDto, HttpSession session) {
-
-        User newuser = getInfo(session);
-        Category newCategory = makeTempCategory(categoryId);
-
-        Posting newPosting = postingSaveDto.toEntity(newuser, newCategory);
-        return postingRepository.save(newPosting);
-    }*/
-
-    public User getUserInfo(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.get();
-    }
-
     @Transactional
-    public Posting save(Long categoryId, PostingSaveDto postingSaveDto) {
+    public Posting save(PostingSaveDto postingSaveDto, User user) {
 
-        User newuser = getUserInfo("test@ab.cd");
-        Category newCategory = makeTempCategory(categoryId);
+        Category newCategory = makeTempCategory(postingSaveDto.getCategoryId());
 
-        Posting newPosting = postingSaveDto.toEntity(newuser, newCategory);
+        Posting newPosting = postingSaveDto.toEntity(user, newCategory);
         return postingRepository.save(newPosting);
     }
 
     @Transactional
-    public void update(Long postId, PostingUpdateDto updateParam) {
+    public void update(PostingUpdateDto updateParam) {
 
-        Posting posting = makeTempPosting(postId);
+        Posting posting = makeTempPosting(updateParam.getPostId());
         Category category = makeTempCategory(updateParam.getCategoryId());
 
         posting.setCategory(category);
@@ -89,23 +73,7 @@ public class PostingService {
 
     public PostingContentResponseDto content(Long postId) {
 
-        Optional<Posting> posting = postingRepository.findById(postId);
-
-        DateTime startTime = DateTime.builder()
-                .year(posting.get().getStartTime().getYear())
-                .month(posting.get().getStartTime().getMonthValue())
-                .day(posting.get().getStartTime().getDayOfMonth())
-                .hour(posting.get().getStartTime().getHour())
-                .minute(posting.get().getStartTime().getMinute())
-                .build();
-
-        DateTime dealine = DateTime.builder()
-                .year(posting.get().getDeadline().getYear())
-                .month(posting.get().getDeadline().getMonthValue())
-                .day(posting.get().getDeadline().getDayOfMonth())
-                .hour(posting.get().getDeadline().getHour())
-                .minute(posting.get().getDeadline().getMinute())
-                .build();
+        Optional<Posting> posting = postingRepository.findByPostIdAndStatus(postId, 2);
 
         Optional<PostingContentResponseDto> postingResponse = Optional.ofNullable(PostingContentResponseDto.builder()
                 .postId(posting.get().getPostId())
@@ -114,8 +82,8 @@ public class PostingService {
                 .nickname(posting.get().getUser().getNickname())
                 .title(posting.get().getTitle())
                 .content(posting.get().getContent())
-                .startTime(startTime)
-                .deadline(dealine)
+                .startTime(posting.get().getStartTime().toString())
+                .deadline(posting.get().getDeadline().toString())
                 .postHits(posting.get().getPostHits() + 1) // 조회수 1 증가
                 .latitude(posting.get().getLatitude())
                 .longitude(posting.get().getLongitude())
@@ -146,9 +114,8 @@ public class PostingService {
     }
 
 
-    public boolean checkUser(Long postId, HttpSession session) {
+    public boolean checkUser(Long postId, User user) {
         Posting posting = makeTempPosting(postId);
-        User user = getInfo(session);
 
         if (posting.getUser().getId() == user.getId()) {
             return true;
@@ -165,17 +132,16 @@ public class PostingService {
         }
     }
 
-
     public List<PostingResponseDto> search(String keyword, Long categoryId){
 
         if (categoryId == 0) {
-            List<Posting> postsListAll = postingRepository.findByTitleContaining(keyword);
+            List<Posting> postsListAll = postingRepository.findByTitleContainingAndStatus(keyword,2);
             List<PostingResponseDto> postingResponseAll = postingListtoPostingResponseList(postsListAll);
             return postingResponseAll;
         }
         else if (categoryId < 3){
             Category category = makeTempCategory(categoryId);
-            List<Posting> postsList = postingRepository.findByTitleContainingAndCategory(keyword, category);
+            List<Posting> postsList = postingRepository.findByTitleContainingAndCategoryAndStatus(keyword, category,2);
             List<PostingResponseDto> postingResponseError = postingListtoPostingResponseList(postsList);
             return postingResponseError;
         }
@@ -184,7 +150,7 @@ public class PostingService {
     }
 
     public List<PostingResponseDto> allPostingList() {
-        List<Posting> postings = postingRepository.findAll();
+        List<Posting> postings = postingRepository.findByStatus(2);
         return postingListtoPostingResponseList(postings);
     }
 
@@ -198,7 +164,7 @@ public class PostingService {
 
         Category category = makeTempCategory(categoryId);
 
-        List<Posting> postings = postingRepository.findByCategory(category);
+        List<Posting> postings = postingRepository.findByCategoryAndStatus(category,2);
         List<PostingResponseDto> postingResponse = postingListtoPostingResponseList(postings);
         return postingResponse;
     }
@@ -219,13 +185,6 @@ public class PostingService {
     public List<PostingContentResponseDto> waiting1PostingsinAdmin() {
         List<Posting> postings = postingRepository.findByStatus(1);
         return postingListtoPostingContentResponseList(postings);
-    }
-
-
-    private User getInfo(HttpSession session){
-        String email = (String) session.getAttribute("email");
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.get();
     }
 
     private Posting makeTempPosting(Long postId) {
@@ -251,14 +210,6 @@ public class PostingService {
         List<PostingResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
 
-            //deadline 년, 월, 일, 시, 분
-            DateTime dealine = DateTime.builder()
-                    .year(posting.getDeadline().getYear())
-                    .month(posting.getDeadline().getMonthValue())
-                    .day(posting.getDeadline().getDayOfMonth())
-                    .hour(posting.getDeadline().getHour())
-                    .minute(posting.getDeadline().getMinute())
-                    .build();
 
             PostingResponseDto postingResponseDto = PostingResponseDto.builder()
                     .postId(posting.getPostId())
@@ -266,8 +217,7 @@ public class PostingService {
                     .userId(posting.getUser().getId())
                     .nickname(posting.getUser().getNickname())
                     .title(posting.getTitle())
-                    //.deadline(posting.getDeadline())
-                    .deadline(dealine)
+                    .deadline(posting.getDeadline().toString())
                     .postHits(posting.getPostHits())
                     .build();
 
@@ -277,30 +227,11 @@ public class PostingService {
     }
 
 
-
-
-
     private List<PostingContentResponseDto> postingListtoPostingContentResponseList(List<Posting> postings){
 
         //Collections.reverse(postings);
         List<PostingContentResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
-
-            DateTime startTime = DateTime.builder()
-                    .year(posting.getStartTime().getYear())
-                    .month(posting.getStartTime().getMonthValue())
-                    .day(posting.getStartTime().getDayOfMonth())
-                    .hour(posting.getStartTime().getHour())
-                    .minute(posting.getStartTime().getMinute())
-                    .build();
-
-            DateTime dealine = DateTime.builder()
-                    .year(posting.getDeadline().getYear())
-                    .month(posting.getDeadline().getMonthValue())
-                    .day(posting.getDeadline().getDayOfMonth())
-                    .hour(posting.getDeadline().getHour())
-                    .minute(posting.getDeadline().getMinute())
-                    .build();
 
             PostingContentResponseDto postingContentResponseDto = PostingContentResponseDto.builder()
                     .postId(posting.getPostId())
@@ -309,8 +240,8 @@ public class PostingService {
                     .nickname(posting.getUser().getNickname())
                     .title(posting.getTitle())
                     .content(posting.getContent())
-                    .startTime(startTime)
-                    .deadline(dealine)
+                    .startTime(posting.getStartTime().toString())
+                    .deadline(posting.getDeadline().toString())
                     .postHits(posting.getPostHits())
                     .latitude(posting.getLatitude())
                     .longitude(posting.getLongitude())

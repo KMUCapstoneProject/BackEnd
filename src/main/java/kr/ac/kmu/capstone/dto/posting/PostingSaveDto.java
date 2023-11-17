@@ -10,13 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PostingSaveDto {
+
+    private Long categoryId;
 
     @NotBlank(message = "제목을 입력해주세요")
     @Pattern(regexp = "^.{2,50}$", message = "2 ~ 50 자리의 제목을 작성해주세요")
