@@ -49,7 +49,7 @@ public class UserService {
     public Boolean checkEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
-    
+
     @Transactional
     public void update(UserUpdateDto dto){
 
