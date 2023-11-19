@@ -12,5 +12,3 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate # 올리는 경우는 validate # 밀고 새로 하고 싶으면 create # 새로운 것 업데이트는 update
-
-
