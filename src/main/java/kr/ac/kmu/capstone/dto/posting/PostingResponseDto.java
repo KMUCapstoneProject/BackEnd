@@ -20,6 +20,7 @@ public class PostingResponseDto {
     private String deadline; //"2023-11-22 01:01:00"
     //private DateTime deadline;  // "deadline": {"year": 2023,"month": 11,"day": 22,"hour": 1,"minute": 1}
     private int postHits;
+    private String details;
 
 
 }

@@ -1,12 +1,10 @@
 package kr.ac.kmu.Capstone.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -43,6 +41,8 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
 
     private int status; // 0: 등록대기, 1: 업데이트 대기, 2: 등록
 
+    private String details;
+
     // 아이콘을 보여줄 위치 정보
     // 따로따로? 아니면 건물별? -> 나중에 수정
     @Column(nullable = false, length = 500)
@@ -53,7 +53,7 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
 
 
     @Builder
-    public Posting(Long postId, User user, Category category, String title, String content, LocalDateTime startTime, LocalDateTime deadline, int postHits, int status, Double latitude, Double longitude) {
+    public Posting(Long postId, User user, Category category, String title, String content, LocalDateTime startTime, LocalDateTime deadline, int postHits, int status, String details, Double latitude, Double longitude) {
         this.postId = postId;
         this.user = user;
         this.category = category;
@@ -63,6 +63,7 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
         this.deadline = deadline;
         this.postHits = postHits;
         this.status = status;
+        this.details = details;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -104,5 +105,9 @@ public class Posting { // 비교과랑 행사랑 카테고리 나눠서 구분??
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 }

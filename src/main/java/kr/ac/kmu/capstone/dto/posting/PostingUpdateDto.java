@@ -37,6 +37,8 @@ public class PostingUpdateDto {
 
     private Double longitude; // y
 
+    private String details;
+
     /*public PostingUpdateDto(String title, String content, LocalDateTime startTime, LocalDateTime deadline, Double latitude, Double longitude) {
         this.title = title;
         this.content = content;

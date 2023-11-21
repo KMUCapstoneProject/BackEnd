@@ -1,19 +1,16 @@
 package kr.ac.kmu.Capstone.service;
 
-import jakarta.servlet.http.HttpSession;
 import kr.ac.kmu.Capstone.dto.posting.*;
 import kr.ac.kmu.Capstone.entity.Category;
 import kr.ac.kmu.Capstone.entity.Posting;
 import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.repository.CategoryRepository;
 import kr.ac.kmu.Capstone.repository.PostingRepository;
-import kr.ac.kmu.Capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -26,7 +23,6 @@ public class PostingService {
     // 검색과 연관되게, list로 불러올 때 어떻게 불러올지?
 
     private final PostingRepository postingRepository;
-    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
     @Transactional
@@ -51,6 +47,7 @@ public class PostingService {
         posting.setDeadline(updateParam.getDeadline());
         posting.setLatitude(updateParam.getLatitude());
         posting.setLongitude(updateParam.getLongitude());
+        posting.setDetails(updateParam.getDetails());
         posting.setStatus(1); // 업데이트 대기
         postingRepository.save(posting);
     }
@@ -87,6 +84,7 @@ public class PostingService {
                 .postHits(posting.get().getPostHits() + 1) // 조회수 1 증가
                 .latitude(posting.get().getLatitude())
                 .longitude(posting.get().getLongitude())
+                .details(posting.get().getDetails())
                 .build());
 
         return postingResponse
@@ -219,6 +217,7 @@ public class PostingService {
                     .title(posting.getTitle())
                     .deadline(posting.getDeadline().toString())
                     .postHits(posting.getPostHits())
+                    .details(posting.getDetails())
                     .build();
 
             postingResponseList.add(postingResponseDto);
@@ -245,6 +244,7 @@ public class PostingService {
                     .postHits(posting.getPostHits())
                     .latitude(posting.getLatitude())
                     .longitude(posting.getLongitude())
+                    .details(posting.getDetails())
                     .build();
 
             postingResponseList.add(postingContentResponseDto);

@@ -41,6 +41,8 @@ public class PostingSaveDto {
 
     private Double longitude; // y
 
+    private String details;
+
 
     public Posting toEntity(User user, Category category) {
         return Posting.builder()
@@ -54,6 +56,7 @@ public class PostingSaveDto {
                 .status(0) // 등록대기
                 .latitude(latitude)
                 .longitude(longitude)
+                .details(details)
                 .build();
     }
 
