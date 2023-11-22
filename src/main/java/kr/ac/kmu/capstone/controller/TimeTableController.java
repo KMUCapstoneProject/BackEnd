@@ -22,7 +22,7 @@ public class TimeTableController {
 
 
     // 엑셀 업로드
-    @GetMapping("/timetable/excelupload")
+    @GetMapping("/excelupload")
     public ResponseEntity uploadTimeTableExcel() throws IOException {
 
         // 메모리 주소로 변경해야함 or db에 url 저장해서 불러오기
