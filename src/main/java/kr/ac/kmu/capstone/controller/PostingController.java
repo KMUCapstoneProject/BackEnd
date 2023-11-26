@@ -37,12 +37,10 @@ public class PostingController {
     // 수정중
     // 검색된 게시물 리스트
     @GetMapping("/search")
-    public ResponseEntity search(@RequestParam String keyword, @RequestParam String categoryId){
+    public ResponseEntity search(@RequestParam String keyword, @RequestParam Long categoryId){
         postingService.refresh();
-        // 값이 안들어옴 수정필요
-        log.info(String.valueOf(categoryId));
 
-        List<PostingResponseDto> searchList = postingService.search(keyword, Long.parseLong(categoryId));
+        List<PostingResponseDto> searchList = postingService.search(keyword, categoryId);
         if (searchList == null) {
             return new ResponseEntity(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
         }

@@ -23,5 +23,6 @@ public class PostingResponseDto {
     private int postHits;
     private Double latitude;
     private Double longitude;
+    private int status;
     private String details;
 }

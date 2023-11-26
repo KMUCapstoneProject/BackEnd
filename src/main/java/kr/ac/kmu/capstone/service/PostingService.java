@@ -84,6 +84,7 @@ public class PostingService {
                 .postHits(posting.get().getPostHits() + 1) // 조회수 1 증가
                 .latitude(posting.get().getLatitude())
                 .longitude(posting.get().getLongitude())
+                .status(posting.get().getStatus())
                 .details(posting.get().getDetails())
                 .build());
 
@@ -140,8 +141,8 @@ public class PostingService {
         else if (categoryId < 3){
             Category category = makeTempCategory(categoryId);
             List<Posting> postsList = postingRepository.findByTitleContainingAndCategoryAndStatus(keyword, category,2);
-            List<PostingResponseDto> postingResponseError = postingListtoPostingResponseList(postsList);
-            return postingResponseError;
+            List<PostingResponseDto> postingResponseCategory = postingListtoPostingResponseList(postsList);
+            return postingResponseCategory;
         }
         return null;
 
@@ -208,7 +209,7 @@ public class PostingService {
         List<PostingResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
 
-            PostingResponseDto postingContentResponseDto = PostingResponseDto.builder()
+            PostingResponseDto postingResponseDto = PostingResponseDto.builder()
                     .postId(posting.getPostId())
                     .categoryId(posting.getCategory().getCategoryId())
                     .userId(posting.getUser().getId())
@@ -220,10 +221,11 @@ public class PostingService {
                     .postHits(posting.getPostHits())
                     .latitude(posting.getLatitude())
                     .longitude(posting.getLongitude())
+                    .status(posting.getStatus())
                     .details(posting.getDetails())
                     .build();
 
-            postingResponseList.add(postingContentResponseDto);
+            postingResponseList.add(postingResponseDto);
         }
         return postingResponseList;
     }
