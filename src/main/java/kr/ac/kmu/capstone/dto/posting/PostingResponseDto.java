@@ -11,16 +11,17 @@ import java.time.LocalDateTime;
 public class PostingResponseDto {
 
     private Long postId;
-    private Long categoryId;
     private Long userId;
+    private Long categoryId;
     private String nickname;
     private String title;
-    // localdatetime을 제대로 넘기지 못하는 것으로 추정.. 이게 문제가 아닌가..
-    //private LocalDateTime deadline; // "2023-11-22T01:01:00"
-    private String deadline; //"2023-11-22 01:01:00"
-    //private DateTime deadline;  // "deadline": {"year": 2023,"month": 11,"day": 22,"hour": 1,"minute": 1}
+    private String content;
+    //private LocalDateTime startTime;
+    //private LocalDateTime deadline;
+    private String startTime;
+    private String deadline;
     private int postHits;
+    private Double latitude;
+    private Double longitude;
     private String details;
-
-
 }

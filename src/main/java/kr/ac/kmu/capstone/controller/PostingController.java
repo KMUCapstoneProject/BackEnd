@@ -1,9 +1,7 @@
 package kr.ac.kmu.Capstone.controller;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
-import kr.ac.kmu.Capstone.dto.posting.PostingContentResponseDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingResponseDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingSaveDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingUpdateDto;
@@ -14,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +67,7 @@ public class PostingController {
     // 게시물 내용 확인
     @GetMapping("/view")
     public ResponseEntity findById(@RequestParam("postId") Long postId) {
-        PostingContentResponseDto posting = postingService.content(postId);
+        PostingResponseDto posting = postingService.content(postId);
         postingService.updatePostHits(postId);
         return new ResponseEntity(posting, HttpStatus.OK);
     }

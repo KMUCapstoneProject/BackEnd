@@ -68,11 +68,11 @@ public class PostingService {
     }
 
 
-    public PostingContentResponseDto content(Long postId) {
+    public PostingResponseDto content(Long postId) {
 
         Optional<Posting> posting = postingRepository.findByPostIdAndStatus(postId, 2);
 
-        Optional<PostingContentResponseDto> postingResponse = Optional.ofNullable(PostingContentResponseDto.builder()
+        Optional<PostingResponseDto> postingResponse = Optional.ofNullable(PostingResponseDto.builder()
                 .postId(posting.get().getPostId())
                 .userId(posting.get().getUser().getId())
                 .categoryId(posting.get().getCategory().getCategoryId())
@@ -168,21 +168,21 @@ public class PostingService {
     }
 
     // 어드민에서 모든 포스팅 리스트로 가져오게 하는 것
-    public List<PostingContentResponseDto> allPostingsinAdmin() {
+    public List<PostingResponseDto> allPostingsinAdmin() {
         List<Posting> postings = postingRepository.findAll();
-        return postingListtoPostingContentResponseList(postings);
+        return postingListtoPostingResponseList(postings);
     }
 
     // 등록 대기 포스팅만 가져오기
-    public List<PostingContentResponseDto> waiting0PostingsinAdmin() {
+    public List<PostingResponseDto> waiting0PostingsinAdmin() {
         List<Posting> postings = postingRepository.findByStatus(0);
-        return postingListtoPostingContentResponseList(postings);
+        return postingListtoPostingResponseList(postings);
     }
 
     // 업데이트 대기 포스팅만 가져오기
-    public List<PostingContentResponseDto> waiting1PostingsinAdmin() {
+    public List<PostingResponseDto> waiting1PostingsinAdmin() {
         List<Posting> postings = postingRepository.findByStatus(1);
-        return postingListtoPostingContentResponseList(postings);
+        return postingListtoPostingResponseList(postings);
     }
 
     private Posting makeTempPosting(Long postId) {
@@ -202,37 +202,13 @@ public class PostingService {
     }
 
 
-
     private List<PostingResponseDto> postingListtoPostingResponseList(List<Posting> postings){
 
+        //Collections.reverse(postings);
         List<PostingResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
 
-
-            PostingResponseDto postingResponseDto = PostingResponseDto.builder()
-                    .postId(posting.getPostId())
-                    .categoryId(posting.getCategory().getCategoryId())
-                    .userId(posting.getUser().getId())
-                    .nickname(posting.getUser().getNickname())
-                    .title(posting.getTitle())
-                    .deadline(posting.getDeadline().toString())
-                    .postHits(posting.getPostHits())
-                    .details(posting.getDetails())
-                    .build();
-
-            postingResponseList.add(postingResponseDto);
-        }
-        return postingResponseList;
-    }
-
-
-    private List<PostingContentResponseDto> postingListtoPostingContentResponseList(List<Posting> postings){
-
-        //Collections.reverse(postings);
-        List<PostingContentResponseDto> postingResponseList = new ArrayList<>();
-        for (Posting posting : postings) {
-
-            PostingContentResponseDto postingContentResponseDto = PostingContentResponseDto.builder()
+            PostingResponseDto postingContentResponseDto = PostingResponseDto.builder()
                     .postId(posting.getPostId())
                     .categoryId(posting.getCategory().getCategoryId())
                     .userId(posting.getUser().getId())

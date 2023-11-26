@@ -1,7 +1,6 @@
 package kr.ac.kmu.Capstone.controller;
 
-import jakarta.servlet.http.HttpSession;
-import kr.ac.kmu.Capstone.dto.posting.PostingContentResponseDto;
+import kr.ac.kmu.Capstone.dto.posting.PostingResponseDto;
 import kr.ac.kmu.Capstone.dto.user.UserResponseDto;
 import kr.ac.kmu.Capstone.service.PostingService;
 import kr.ac.kmu.Capstone.service.UserService;
@@ -27,22 +26,22 @@ public class AdminController {
 
     // 전체 글 리스트로 불러오기
     @GetMapping("/posting/list")
-    public List<PostingContentResponseDto> getAllPostings() {
-        List<PostingContentResponseDto> list = postingService.allPostingsinAdmin();
+    public List<PostingResponseDto> getAllPostings() {
+        List<PostingResponseDto> list = postingService.allPostingsinAdmin();
         return list;
     }
 
     // 등록 대기 글 리스트만 불러오기
     @GetMapping("/posting/list/waiting0")
-    public List<PostingContentResponseDto> getWaiting0Postings() {
-        List<PostingContentResponseDto> list = postingService.waiting0PostingsinAdmin();
+    public List<PostingResponseDto> getWaiting0Postings() {
+        List<PostingResponseDto> list = postingService.waiting0PostingsinAdmin();
         return list;
     }
 
     // 업데이트 대기 글 리스트만 불러오기
     @GetMapping("/posting/list/waiting1")
-    public List<PostingContentResponseDto> getWaiting1Postings() {
-        List<PostingContentResponseDto> list = postingService.waiting1PostingsinAdmin();
+    public List<PostingResponseDto> getWaiting1Postings() {
+        List<PostingResponseDto> list = postingService.waiting1PostingsinAdmin();
         return list;
     }
 
