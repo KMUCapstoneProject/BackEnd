@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping("/hello")
     public ResponseEntity hello() {
-        return new ResponseEntity("hello", HttpStatus.OK);
+        return new ResponseEntity("CI/CD Testing Success", HttpStatus.OK);
     }
 
     // 회원가입
