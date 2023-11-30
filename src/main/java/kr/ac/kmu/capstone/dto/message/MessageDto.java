@@ -1,4 +1,4 @@
-package kr.ac.kmu.Capstone.repository;
+package kr.ac.kmu.Capstone.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
