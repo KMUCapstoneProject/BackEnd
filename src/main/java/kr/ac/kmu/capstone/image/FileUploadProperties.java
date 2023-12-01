@@ -1,7 +1,9 @@
 package kr.ac.kmu.Capstone.image;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+@Component
 @ConfigurationProperties(prefix="file")
 public class FileUploadProperties {
     private String uploadDir;
