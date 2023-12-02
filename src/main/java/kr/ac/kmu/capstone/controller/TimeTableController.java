@@ -2,12 +2,16 @@ package kr.ac.kmu.Capstone.controller;
 
 import jakarta.validation.Valid;
 import kr.ac.kmu.Capstone.dto.timetable.TimetableSaveDto;
+import kr.ac.kmu.Capstone.image.FileUploadDownloadService;
+import kr.ac.kmu.Capstone.image.FileUploadResponse;
 import kr.ac.kmu.Capstone.service.TimeTableService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,15 +23,19 @@ import java.util.List;
 public class TimeTableController {
 
     private TimeTableService timeTableService;
-
+    private FileUploadDownloadService service;
 
     // 엑셀 업로드
-    @GetMapping("/excelupload")
-    public ResponseEntity uploadTimeTableExcel() throws IOException {
+    @PostMapping("/excelupload")
+    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
-        // 메모리 주소로 변경해야함 or db에 url 저장해서 불러오기
-        String path = "excel의 url 입력해야함";
-        timeTableService.makeTimetableFromExcel(path);
+        String fileName = service.storeFile(file);
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(fileName)
+                .toUriString();
+        
+        timeTableService.makeTimetableFromExcel(fileDownloadUri);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
