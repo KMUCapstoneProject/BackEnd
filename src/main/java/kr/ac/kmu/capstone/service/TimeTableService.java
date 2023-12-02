@@ -13,9 +13,10 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -74,8 +74,8 @@ public class TimeTableService {
         return resultList;
     }
 
-    public void makeTimetableFromExcel(String path) throws IOException {
-        List<String> timetables = readExcel(path);
+    public void makeTimetableFromExcel(MultipartFile file) throws IOException {
+        List<String> timetables = readExcel(file);
         parseStringList(timetables);
 
     }
@@ -83,12 +83,12 @@ public class TimeTableService {
 
 
     // 엑셀 데이터 읽어오기
-    public List<String> readExcel(String path) throws IOException {
+    public List<String> readExcel(MultipartFile file) throws IOException {
 
         List<String> timetableList = new ArrayList<>();
 
-        FileInputStream file = new FileInputStream(path); // 파일 읽기
-        XSSFWorkbook workbook = new XSSFWorkbook(file); // 엑셀 파일 파싱
+        InputStream inputStream = file.getInputStream();// 파일 읽기
+        XSSFWorkbook workbook = new XSSFWorkbook(inputStream); // 엑셀 파일 파싱
 
         XSSFSheet sheet = workbook.getSheetAt(0); // 엑셀 파일의 첫번째 (0) 시트지
         int rows = sheet.getPhysicalNumberOfRows(); // 행의 수
