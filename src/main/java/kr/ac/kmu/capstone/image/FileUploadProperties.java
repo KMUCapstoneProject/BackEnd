@@ -2,6 +2,7 @@ package kr.ac.kmu.Capstone.image;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 @Component
 @ConfigurationProperties(prefix="file")
@@ -22,7 +23,6 @@ public class FileUploadProperties {
     public String getExcelUploadDir() {
         return excelUploadDir;
     }
-
     public void setExcelUploadDir(String excelUploadDir) {
         this.excelUploadDir = excelUploadDir;
     }
