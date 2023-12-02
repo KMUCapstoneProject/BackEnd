@@ -21,6 +21,9 @@ public class FileUploadDownloadService {
     private final FileUploadResponseRepository fileUploadResponseRepository;
 
     @Autowired
+    private FileUploadProperties fileUploadProperties;
+
+    @Autowired
     public FileUploadDownloadService(FileUploadProperties prop, FileUploadResponseRepository fileUploadResponseRepository) {
         this.fileLocation = Paths.get(prop.getUploadDir())
                 .toAbsolutePath().normalize();
@@ -32,45 +35,24 @@ public class FileUploadDownloadService {
             throw new FileUploadException("파일을 업로드할 디렉토리를 생성하지 못했습니다.", e);
         }
     }
-    /*
-    @Autowired
-    public FileUploadDownloadService(FileUploadProperties prop) {
-        this.fileLocation = Paths.get(prop.getUploadDir())
-                .toAbsolutePath().normalize();
 
-        try {
-            Files.createDirectories(this.fileLocation);
-        }catch(Exception e) {
-            throw new FileUploadException("파일을 업로드할 디렉토리를 생성하지 못했습니다.", e);
-        }
-    }*/
-    /*
-    public String storeFile(MultipartFile file) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        try {
-            // 파일명에 부적합 문자가 있는지 확인한다.
-            if(fileName.contains(".."))
-                throw new FileUploadException("파일명에 부적합 문자가 포함되어 있습니다. " + fileName);
-
-            Path targetLocation = this.fileLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            // FileUploadResponse 생성 후 저장
-            FileUploadResponse fileUploadResponse = new FileUploadResponse(fileName, targetLocation.toString(), file.getContentType(), file.getSize());
-            fileUploadResponseRepository.save(fileUploadResponse);
-
-            return fileName;
-        }catch(Exception e) {
-            throw new FileUploadException("["+fileName+"] 파일 업로드에 실패하였습니다. 다시 시도하십시오.",e);
-        }
-    }*/
     public String storeFile(MultipartFile file) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
             if (fileName.contains(".."))
                 throw new FileUploadException("파일명에 부적합 문자가 포함되어 있습니다. " + fileName);
+
+            String fileExtension = getFileExtension(fileName);
+            String fileUploadDir;
+
+            if (isImageFile(fileExtension)) {
+                fileUploadDir = fileUploadProperties.getUploadDir();
+            } else if (isExcelFile(fileExtension)) {
+                fileUploadDir = fileUploadProperties.getExcelUploadDir();
+            } else {
+                throw new FileUploadException("유효하지 않은 파일 유형입니다.");
+            }
 
             Path targetLocation = this.fileLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -103,5 +85,22 @@ public class FileUploadDownloadService {
         }catch(MalformedURLException e) {
             throw new FileDownloadException(fileName + " 파일을 찾을 수 없습니다.", e);
         }
+    }
+    private String getFileExtension(String fileName) {
+        return StringUtils.getFilenameExtension(fileName);
+    }
+
+    // 이미지 파일 여부를 확인하는 메서드
+    private boolean isImageFile(String fileExtension) {
+        return fileExtension.equalsIgnoreCase("jpg") ||
+                fileExtension.equalsIgnoreCase("jpeg") ||
+                fileExtension.equalsIgnoreCase("png") ||
+                fileExtension.equalsIgnoreCase("gif");
+    }
+
+    // 엑셀 파일 여부를 확인하는 메서드
+    private boolean isExcelFile(String fileExtension) {
+        return fileExtension.equalsIgnoreCase("xls") ||
+                fileExtension.equalsIgnoreCase("xlsx");
     }
 }

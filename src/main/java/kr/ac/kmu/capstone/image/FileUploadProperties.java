@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix="file")
 public class FileUploadProperties {
+    @Value("file.upload-dir")
     private String uploadDir;
+
+    @Value("file.excel-upload-dir")
+    private String excelUploadDir;
 
     public String getUploadDir() {
         return uploadDir;
@@ -14,5 +18,12 @@ public class FileUploadProperties {
 
     public void setUploadDir(String uploadDir) {
         this.uploadDir = uploadDir;
+    }
+    public String getExcelUploadDir() {
+        return excelUploadDir;
+    }
+
+    public void setExcelUploadDir(String excelUploadDir) {
+        this.excelUploadDir = excelUploadDir;
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class MessageController {
     private final MessageService messageService;
 
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/messages")
     public Response<?> sendMessage(@RequestBody MessageDto messageDto, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
