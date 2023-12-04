@@ -2,8 +2,10 @@ package kr.ac.kmu.Capstone.service;
 
 import kr.ac.kmu.Capstone.dto.posting.*;
 import kr.ac.kmu.Capstone.entity.Category;
+import kr.ac.kmu.Capstone.entity.Files;
 import kr.ac.kmu.Capstone.entity.Posting;
 import kr.ac.kmu.Capstone.entity.User;
+import kr.ac.kmu.Capstone.image.FileRepository;
 import kr.ac.kmu.Capstone.repository.CategoryRepository;
 import kr.ac.kmu.Capstone.repository.PostingRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class PostingService {
 
     private final PostingRepository postingRepository;
     private final CategoryRepository categoryRepository;
+    private final FileRepository fileRepository;
 
     @Transactional
     public Posting save(PostingSaveDto postingSaveDto, User user) {
@@ -72,6 +75,12 @@ public class PostingService {
 
         Optional<Posting> posting = postingRepository.findByPostIdAndStatus(postId, 2);
 
+        List<Files> files = fileRepository.findByPostId(postId);
+        List<String> imgUrls = new ArrayList<>();
+        for (Files file : files) {
+            imgUrls.add(file.getFileDownloadUri());
+        }
+
         Optional<PostingResponseDto> postingResponse = Optional.ofNullable(PostingResponseDto.builder()
                 .postId(posting.get().getPostId())
                 .userId(posting.get().getUser().getId())
@@ -86,6 +95,7 @@ public class PostingService {
                 .longitude(posting.get().getLongitude())
                 .status(posting.get().getStatus())
                 .details(posting.get().getDetails())
+                .imgUrl(imgUrls)
                 .build());
 
         return postingResponse
@@ -209,6 +219,12 @@ public class PostingService {
         List<PostingResponseDto> postingResponseList = new ArrayList<>();
         for (Posting posting : postings) {
 
+            List<Files> files = fileRepository.findByPostId(posting.getPostId());
+            List<String> imgUrls = new ArrayList<>();
+            for (Files file : files) {
+                imgUrls.add(file.getFileDownloadUri());
+            }
+
             PostingResponseDto postingResponseDto = PostingResponseDto.builder()
                     .postId(posting.getPostId())
                     .categoryId(posting.getCategory().getCategoryId())
@@ -223,6 +239,7 @@ public class PostingService {
                     .longitude(posting.getLongitude())
                     .status(posting.getStatus())
                     .details(posting.getDetails())
+                    .imgUrl(imgUrls)
                     .build();
 
             postingResponseList.add(postingResponseDto);

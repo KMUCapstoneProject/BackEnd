@@ -5,7 +5,9 @@ import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
 import kr.ac.kmu.Capstone.dto.posting.PostingResponseDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingSaveDto;
 import kr.ac.kmu.Capstone.dto.posting.PostingUpdateDto;
+import kr.ac.kmu.Capstone.entity.Posting;
 import kr.ac.kmu.Capstone.entity.User;
+import kr.ac.kmu.Capstone.image.FileUploadDownloadService;
 import kr.ac.kmu.Capstone.service.PostingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,6 +28,7 @@ import java.util.List;
 public class PostingController {
 
     private PostingService postingService;
+    private FileUploadDownloadService fileService;
 
     // 카테고리별 게시물 리스트 // 0은 전체
     @GetMapping("/list")
@@ -49,7 +53,7 @@ public class PostingController {
 
     // 게시물 추가
     @PostMapping("/add")
-    public ResponseEntity save(@Valid @RequestBody PostingSaveDto postingSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
+    public ResponseEntity save(@RequestParam("file") MultipartFile file, @Valid @RequestBody PostingSaveDto postingSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
         //categoryId, title, content, startTime, deadline, latitude, longitude), session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -57,8 +61,11 @@ public class PostingController {
                 return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
             }
         }
+
         User user = customUserDetails.getUser();
-        postingService.save(postingSaveDto, user);
+        Posting save = postingService.save(postingSaveDto, user);
+        fileService.storeFile(file,save.getPostId());
+
         return new ResponseEntity(HttpStatus.CREATED);
     }
 

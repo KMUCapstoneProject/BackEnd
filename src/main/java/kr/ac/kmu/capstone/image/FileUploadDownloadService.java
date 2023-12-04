@@ -1,5 +1,6 @@
 package kr.ac.kmu.Capstone.image;
 
+import kr.ac.kmu.Capstone.entity.Files;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -9,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -18,25 +18,25 @@ import java.nio.file.StandardCopyOption;
 public class FileUploadDownloadService {
 
     private final Path fileLocation;
-    private final FileUploadResponseRepository fileUploadResponseRepository;
+    private final FileRepository fileRepository;
 
     @Autowired
     private FileUploadProperties fileUploadProperties;
 
     @Autowired
-    public FileUploadDownloadService(FileUploadProperties prop, FileUploadResponseRepository fileUploadResponseRepository) {
+    public FileUploadDownloadService(FileUploadProperties prop, FileRepository fileRepository) {
         this.fileLocation = Paths.get(prop.getUploadDir())
                 .toAbsolutePath().normalize();
-        this.fileUploadResponseRepository = fileUploadResponseRepository; // 주입 받은 Repository 할당
+        this.fileRepository = fileRepository; // 주입 받은 Repository 할당
 
         try {
-            Files.createDirectories(this.fileLocation);
+            java.nio.file.Files.createDirectories(this.fileLocation);
         } catch (Exception e) {
             throw new FileUploadException("파일을 업로드할 디렉토리를 생성하지 못했습니다.", e);
         }
     }
 
-    public String storeFile(MultipartFile file) {
+    public String storeFile(MultipartFile file, Long postId) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
@@ -55,7 +55,7 @@ public class FileUploadDownloadService {
             }
 
             Path targetLocation = this.fileLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            java.nio.file.Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             // 파일 다운로드 URL 생성
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -63,15 +63,15 @@ public class FileUploadDownloadService {
                     .path(fileName)
                     .toUriString();
 
-            // FileUploadResponse에 URL을 저장
-            FileUploadResponse fileUploadResponse = new FileUploadResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize());
-            fileUploadResponseRepository.save(fileUploadResponse);
+            Files saveFiles = new Files(fileName, fileDownloadUri, file.getContentType(), file.getSize(), postId);
+            fileRepository.save(saveFiles);
 
             return fileName;
         } catch (Exception e) {
             throw new FileUploadException("[" + fileName + "] 파일 업로드에 실패하였습니다. 다시 시도하십시오.", e);
         }
     }
+
     public Resource loadFileAsResource(String fileName) {
         try {
             Path filePath = this.fileLocation.resolve(fileName).normalize();

@@ -2,9 +2,8 @@ package kr.ac.kmu.Capstone.dto.posting;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -16,8 +15,6 @@ public class PostingResponseDto {
     private String nickname;
     private String title;
     private String content;
-    //private LocalDateTime startTime;
-    //private LocalDateTime deadline;
     private String startTime;
     private String deadline;
     private int postHits;
@@ -25,4 +22,5 @@ public class PostingResponseDto {
     private Double longitude;
     private int status;
     private String details;
+    private List<String> imgUrl;
 }
