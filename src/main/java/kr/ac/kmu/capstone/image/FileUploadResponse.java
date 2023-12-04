@@ -1,5 +1,8 @@
 package kr.ac.kmu.Capstone.image;
 
+import lombok.Getter;
+
+@Getter
 public class FileUploadResponse {
 
     private String fileName;

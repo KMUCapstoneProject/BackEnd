@@ -1,6 +1,7 @@
 package kr.ac.kmu.Capstone.image;
 
 import jakarta.servlet.http.HttpServletRequest;
+import kr.ac.kmu.Capstone.entity.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,15 @@ public class FileUploadController {
 
         @PostMapping("/uploadFile")
         public FileUploadResponse uploadFile(@RequestParam("file") MultipartFile file) {
+            Files files = service.storeFile(file);
 
-            return service.storeFile(file);
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/downloadFile/")
+                    .path(files.getFileName())
+                    .toUriString();
+
+
+            return new FileUploadResponse(files.getFileName(), fileDownloadUri, file.getContentType(), file.getSize(), files.getPostId());
         }
 
         @PostMapping("/uploadMultipleFiles")

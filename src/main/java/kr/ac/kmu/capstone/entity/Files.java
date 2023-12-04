@@ -20,8 +20,8 @@ public class Files {
     private String fileType;
     private Long size;
 
-    @ManyToOne(targetEntity = Posting.class, fetch = FetchType.EAGER) //Many = File, One = posting, 한 게시글에 여러 개 파일
-    @JoinColumn(name = "post_id")
+    /*@ManyToOne(targetEntity = Posting.class, fetch = FetchType.EAGER) //Many = File, One = posting, 한 게시글에 여러 개 파일
+    @JoinColumn(name = "post_id")*/
     private Long postId;
 
     public Files(String fileName, String fileDownloadUri, String fileType, Long size, Long postId) {
