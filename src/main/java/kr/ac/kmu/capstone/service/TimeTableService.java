@@ -54,7 +54,6 @@ public class TimeTableService {
         List<String> emptyClassNumLists = new ArrayList<>();
 
         for (TimeTable classList : classLists) {
-            //log.info(String.valueOf(classList.getWeek()));
 
             // 요일이 동일
             if (classList.getWeek().equals(currentWeek)) {
@@ -153,6 +152,17 @@ public class TimeTableService {
         String building = null;
         String classNum = null;
 
+        Map<String, String> changeBuildingValue = new HashMap<>();
+        changeBuildingValue.put("공1", "공대1호관");
+        changeBuildingValue.put("공2", "공대2호관");
+        changeBuildingValue.put("공3", "공대3호관");
+        changeBuildingValue.put("공4", "공대4호관");
+        changeBuildingValue.put("공5", "공대5호관");
+        changeBuildingValue.put("건7", "덕래관");
+        changeBuildingValue.put("오", "오산관");
+        changeBuildingValue.put("쉐", "쉐턱관");
+        changeBuildingValue.put("의", "의양관");
+
 
         for (String timetable : timetableList) {
 
@@ -182,7 +192,7 @@ public class TimeTableService {
                         endtime2 = timeTableMakeDto.getEndtime();
                     }
                     else if(timeTableMakeDto.getWeek() == null) { // 건물, 강의실 정보
-                        building = timeTableMakeDto.getBuilding();
+                        building = changeBuildingValue.get(timeTableMakeDto.getBuilding());
                         classNum = timeTableMakeDto.getClassNum();
 
                         if (week2 == null) { // 시간정보1, 위치정보1, 하나만 저장
