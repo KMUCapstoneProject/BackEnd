@@ -27,10 +27,9 @@ public class FileUploadController {
     private FileUploadDownloadService service;
 
         @PostMapping("/uploadFile")
-        public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) {
+        public FileUploadResponse uploadFile(@RequestParam("file") MultipartFile file) {
 
-            service.storeFile(file);
-            return new ResponseEntity(HttpStatus.CREATED);
+            return service.storeFile(file);
         }
 
         @PostMapping("/uploadMultipleFiles")

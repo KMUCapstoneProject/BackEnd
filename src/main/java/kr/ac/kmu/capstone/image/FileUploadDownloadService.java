@@ -38,7 +38,7 @@ public class FileUploadDownloadService {
         }
     }
 
-    public String storeFile(MultipartFile file) {
+    public FileUploadResponse storeFile(MultipartFile file) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
@@ -70,7 +70,7 @@ public class FileUploadDownloadService {
             Files saveFiles = new Files(fileName, fileDownloadUri, file.getContentType(), file.getSize(), maxPostId);
             fileRepository.save(saveFiles);
 
-            return fileName;
+            return new FileUploadResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize(), maxPostId);
         } catch (Exception e) {
             throw new FileUploadException("[" + fileName + "] 파일 업로드에 실패하였습니다. 다시 시도하십시오.", e);
         }
