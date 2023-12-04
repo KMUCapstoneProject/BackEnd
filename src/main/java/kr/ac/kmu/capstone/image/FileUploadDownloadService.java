@@ -20,16 +20,17 @@ public class FileUploadDownloadService {
 
     private final Path fileLocation;
     private final FileRepository fileRepository;
-    private PostingRepository postingRepository;
+    private final PostingRepository postingRepository;
 
     @Autowired
     private FileUploadProperties fileUploadProperties;
 
     @Autowired
-    public FileUploadDownloadService(FileUploadProperties prop, FileRepository fileRepository) {
+    public FileUploadDownloadService(FileUploadProperties prop, FileRepository fileRepository, PostingRepository postingRepository) {
         this.fileLocation = Paths.get(prop.getUploadDir())
                 .toAbsolutePath().normalize();
         this.fileRepository = fileRepository; // 주입 받은 Repository 할당
+        this.postingRepository = postingRepository;
 
         try {
             java.nio.file.Files.createDirectories(this.fileLocation);
