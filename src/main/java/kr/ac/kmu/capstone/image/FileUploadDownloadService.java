@@ -1,6 +1,7 @@
 package kr.ac.kmu.Capstone.image;
 
 import kr.ac.kmu.Capstone.entity.Files;
+import kr.ac.kmu.Capstone.repository.PostingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -19,6 +20,7 @@ public class FileUploadDownloadService {
 
     private final Path fileLocation;
     private final FileRepository fileRepository;
+    private PostingRepository postingRepository;
 
     @Autowired
     private FileUploadProperties fileUploadProperties;
@@ -36,7 +38,7 @@ public class FileUploadDownloadService {
         }
     }
 
-    public String storeFile(MultipartFile file, Long postId) {
+    public String storeFile(MultipartFile file) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
@@ -63,7 +65,9 @@ public class FileUploadDownloadService {
                     .path(fileName)
                     .toUriString();
 
-            Files saveFiles = new Files(fileName, fileDownloadUri, file.getContentType(), file.getSize(), postId);
+            Long maxPostId = postingRepository.findMaxPostId();
+
+            Files saveFiles = new Files(fileName, fileDownloadUri, file.getContentType(), file.getSize(), maxPostId);
             fileRepository.save(saveFiles);
 
             return fileName;

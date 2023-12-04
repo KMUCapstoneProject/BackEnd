@@ -53,7 +53,7 @@ public class PostingController {
 
     // 게시물 추가
     @PostMapping("/add")
-    public ResponseEntity save(@RequestParam("file") MultipartFile file, @Valid @RequestBody PostingSaveDto postingSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
+    public ResponseEntity save(@Valid @RequestBody PostingSaveDto postingSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult) {
         //categoryId, title, content, startTime, deadline, latitude, longitude), session
         if (bindingResult.hasErrors()) {
             List<FieldError> list = bindingResult.getFieldErrors();
@@ -63,8 +63,7 @@ public class PostingController {
         }
 
         User user = customUserDetails.getUser();
-        Posting save = postingService.save(postingSaveDto, user);
-        fileService.storeFile(file,save.getPostId());
+        postingService.save(postingSaveDto, user);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }

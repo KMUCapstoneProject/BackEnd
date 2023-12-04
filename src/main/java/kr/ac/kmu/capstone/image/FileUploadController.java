@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +27,10 @@ public class FileUploadController {
     private FileUploadDownloadService service;
 
         @PostMapping("/uploadFile")
-        public FileUploadResponse uploadFile(@RequestParam("file") MultipartFile file) {
-            String fileName = service.storeFile(file, null);
+        public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) {
 
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/downloadFile/")
-                    .path(fileName)
-                    .toUriString();
-
-            return new FileUploadResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize(), null);
+            service.storeFile(file);
+            return new ResponseEntity(HttpStatus.CREATED);
         }
 
         @PostMapping("/uploadMultipleFiles")
