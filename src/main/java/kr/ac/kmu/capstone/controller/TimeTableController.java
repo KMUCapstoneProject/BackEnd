@@ -1,6 +1,7 @@
 package kr.ac.kmu.Capstone.controller;
 
 import jakarta.validation.Valid;
+import kr.ac.kmu.Capstone.dto.timetable.TimeTableResponseDto;
 import kr.ac.kmu.Capstone.dto.timetable.TimetableSaveDto;
 import kr.ac.kmu.Capstone.service.TimeTableService;
 import lombok.AllArgsConstructor;
@@ -42,7 +43,7 @@ public class TimeTableController {
     @GetMapping("/findClassinBuilding")
     public ResponseEntity findClassinBuilding(@RequestParam String building) {
 
-        List<String> emptyRooms = timeTableService.findEmptyClass(building);
+        List<TimeTableResponseDto> emptyRooms = timeTableService.findEmptyClass(building);
         return new ResponseEntity(emptyRooms, HttpStatus.OK);
     }
 

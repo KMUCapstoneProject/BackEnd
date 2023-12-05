@@ -1,6 +1,7 @@
 package kr.ac.kmu.Capstone.service;
 
 import kr.ac.kmu.Capstone.dto.timetable.TimeTableMakeDto;
+import kr.ac.kmu.Capstone.dto.timetable.TimeTableResponseDto;
 import kr.ac.kmu.Capstone.dto.timetable.TimetableSaveDto;
 import kr.ac.kmu.Capstone.entity.TimeTable;
 import kr.ac.kmu.Capstone.repository.TimeTableRepository;
@@ -43,8 +44,8 @@ public class TimeTableService {
         timeTableRepository.save(newTimetable);
     }
 
-    // 현재시간과 비교해서 빈 강의실 찾기
-    public List<String> findEmptyClass(String building){
+    // 현재시간과 비교해서 빈 강의실 찾기 + 다음 수업 시작 시간
+    public List<TimeTableResponseDto> findEmptyClass(String building){
         List<TimeTable> classLists = timeTableRepository.findByBuilding(building);
 
         LocalDateTime current = LocalDateTime.now();
@@ -53,11 +54,13 @@ public class TimeTableService {
 
         List<String> emptyClassNumLists = new ArrayList<>();
         List<String> fullClassNumLists = new ArrayList<>();
+        List<TimeTableResponseDto> forFindNextClassTimeList = new ArrayList<>();
 
         for (TimeTable classList : classLists) {
 
             // 요일이 동일
             if (classList.getWeek().equals(currentWeek)) {
+                forFindNextClassTimeList.add(new TimeTableResponseDto(classList.getClassNum(), classList.getStarttime()));
                 // 시간이 start와 end 사이가 아닐 때 (앞이나 뒤)
                 //isbefore(앞의시간이 뒤의시간보다 과거인가), isafter(앞의시간이 뒤의시간보다 미래인가)
                 if (classList.getStarttime().isBefore(currentTime) && classList.getEndtime().isAfter(currentTime)){
@@ -76,9 +79,37 @@ public class TimeTableService {
         emptyClassNumLists.removeAll(fullClassNumLists);
 
         // 중복 제거
-        List<String> resultList = emptyClassNumLists.stream().distinct().collect(toList());
+        List<String> emptyClassList = emptyClassNumLists.stream().distinct().collect(toList());
 
-        return resultList;
+
+        // emptyClassList를 List<TimeTableResponseDto>로 변환
+        List<TimeTableResponseDto> emptyTimeTableResponseList = new ArrayList<>();
+        for (String classNum : emptyClassList) {
+            // 오늘의 남은 강의가 없거나, 오늘 날짜에는 비어있다면 null로 설정
+            LocalTime nextClassStartTime = null;
+
+            // 뒤에 시작하는 강의가 있으면 그 시작 시간을 설정
+            // 오늘 강의실
+            for (TimeTableResponseDto timeTableResponseDto : forFindNextClassTimeList) {
+                // 강의실 번호 동일
+                if (timeTableResponseDto.getClassNum().equals(classNum)) {
+                    // 강의실 시간 업데이트
+                    if (nextClassStartTime == null || timeTableResponseDto.getNextStartTime().isAfter(LocalTime.now())
+                            || timeTableResponseDto.getNextStartTime().isAfter(nextClassStartTime)) {
+                        nextClassStartTime = timeTableResponseDto.getNextStartTime();
+                    }
+                }
+            }
+
+            // 오늘 남은 강의가 없을 때
+            if (nextClassStartTime != null && nextClassStartTime.isBefore(LocalTime.now()))
+                nextClassStartTime = null;
+
+
+            emptyTimeTableResponseList.add(new TimeTableResponseDto(classNum, nextClassStartTime));
+        }
+
+        return emptyTimeTableResponseList;
     }
 
 
