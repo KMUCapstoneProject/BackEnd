@@ -52,6 +52,7 @@ public class TimeTableService {
         LocalTime currentTime = current.toLocalTime();
 
         List<String> emptyClassNumLists = new ArrayList<>();
+        List<String> fullClassNumLists = new ArrayList<>();
 
         for (TimeTable classList : classLists) {
 
@@ -59,7 +60,11 @@ public class TimeTableService {
             if (classList.getWeek().equals(currentWeek)) {
                 // 시간이 start와 end 사이가 아닐 때 (앞이나 뒤)
                 //isbefore(앞의시간이 뒤의시간보다 과거인가), isafter(앞의시간이 뒤의시간보다 미래인가)
-                if (classList.getStarttime().isAfter(currentTime) && classList.getEndtime().isBefore(currentTime)){
+                if (classList.getStarttime().isBefore(currentTime) && classList.getEndtime().isAfter(currentTime)){
+                    fullClassNumLists.add(classList.getClassNum());
+
+                }
+                else {
                     emptyClassNumLists.add(classList.getClassNum());
                 }
             }
@@ -67,11 +72,15 @@ public class TimeTableService {
                 emptyClassNumLists.add(classList.getClassNum());
         }
 
+        // empty에 속한 full 제거
+        emptyClassNumLists.removeAll(fullClassNumLists);
+
         // 중복 제거
         List<String> resultList = emptyClassNumLists.stream().distinct().collect(toList());
 
         return resultList;
     }
+
 
     public void makeTimetableFromExcel(MultipartFile file) throws IOException {
         List<String> timetables = readExcel(file);
