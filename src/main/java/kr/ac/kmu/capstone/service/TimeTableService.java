@@ -335,7 +335,7 @@ public class TimeTableService {
                 String building = input.substring(0,2); // 2글자 가져오기
                 //System.out.println("building: " + building);
                 if (input.contains("-")) {
-                    String classNum = input.substring(2,7);
+                    String classNum = input.substring(1,7);
 
                     return TimeTableMakeDto.builder()
                             .building(building)
@@ -343,7 +343,7 @@ public class TimeTableService {
                             .build();
                 }
                 else {
-                    String classNum = input.substring(2,5);
+                    String classNum = input.substring(1,5); // 앞에 건물 번호 붙여서
 
                     return TimeTableMakeDto.builder()
                             .building(building)
