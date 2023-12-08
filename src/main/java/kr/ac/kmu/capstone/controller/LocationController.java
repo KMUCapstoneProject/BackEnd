@@ -19,12 +19,10 @@ public class LocationController {
 
     @GetMapping("/find")
     public ResponseEntity<String> findPath(@RequestParam String start_name, @RequestParam String end_name) {
-        //start_name = 동산도서관, end_name = 영암관
 
-        //System.out.println("1"); // << 진행 위치 겸 테스트용으로 1 찍은거
         Path resultPath = locationService.findDijkstraPath(start_name, end_name);
         String test = convertPathToText(resultPath);
-        //System.out.println("2"); // // << 진행 위치 겸 테스트용으로 2 찍은거
+
         if(resultPath != null) {
             System.out.println(test);
             return new ResponseEntity<>(test, HttpStatus.OK);
@@ -33,17 +31,16 @@ public class LocationController {
         }
     }
 
-    @GetMapping("/find_a")
+    @GetMapping("/find_A")
     public ResponseEntity<String> findPath_A(@RequestParam String start_name, @RequestParam String end_name) {
-        //start_name = 동산도서관, end_name = 영암관
-        //System.out.println("1"); // << 진행 위치 겸 테스트용으로 1 찍은거
+
 
         String start_name_A = start_name + "_A";
         String end_name_A = end_name + "_A";
 
         Path resultPath = locationService.findDijkstraPath(start_name_A, end_name_A);
         String test = convertPathToText(resultPath);
-        //System.out.println("2"); // // << 진행 위치 겸 테스트용으로 2 찍은거
+
         if(resultPath != null) {
             System.out.println(test);
             return new ResponseEntity<>(test, HttpStatus.OK);
@@ -58,7 +55,6 @@ public class LocationController {
             @RequestParam double start_pos_latitude,
             @RequestParam double start_pos_longitude,
             @RequestParam String end_name) {
-        //start_name = 내 위치, end_name = 영암관
 
         LocationDto locationDto = new LocationDto();
         locationDto.setName(start_position);
@@ -68,7 +64,7 @@ public class LocationController {
 
         Path resultPath = locationService.findMyDijkstraPath(locationDto, end_name);
         String test = convertPathToText(resultPath);
-        //System.out.println("2"); // // << 진행 위치 겸 테스트용으로 2 찍은거
+
         if(resultPath != null) {
             System.out.println(test);
             return new ResponseEntity<>(test, HttpStatus.OK);
@@ -83,7 +79,6 @@ public class LocationController {
             @RequestParam double start_pos_latitude,
             @RequestParam double start_pos_longitude,
             @RequestParam String end_name) {
-        //start_name = 내 위치, end_name = 영암관
 
         LocationDto locationDto = new LocationDto();
         locationDto.setName(start_position + "_A");
@@ -121,6 +116,6 @@ public class LocationController {
         double latitude = node.get("latitude").asDouble();
         double longitude = node.get("longitude").asDouble();
 
-        return String.format("%f,%f", latitude, longitude);
+        return String.format("%.5f,%.5f", latitude, longitude);
     }
 }

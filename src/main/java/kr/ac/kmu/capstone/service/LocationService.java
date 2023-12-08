@@ -44,8 +44,8 @@ public class LocationService {
     public Path findMyDijkstraPath(LocationDto locationDto, String end_name) {
         try (Session session = driver.session()) {
             // 1. 우선 나와 가장 거리가 가까운 점을 찾아온다. >> 성공
-            // 2. 가장 가까운 점과 종점을 dijkstra 해서 거리를 구한다.
-            // 3. 출력 해준다
+            // 2. 가장 가까운 점과 종점을 dijkstra 해서 거리를 구한다. >> 성공
+            // 3. 출력 해준다 >> 성공
 
             String findNodeQuery = "MATCH (n)\n" +
                     "WITH n, point({latitude: n.latitude, longitude: n.longitude}) AS nodeLocation,\n" +
@@ -82,6 +82,7 @@ public class LocationService {
         return null;
     }
 
+    //계단 없는 버전
     public Path findMyDijkstraPath_A(LocationDto locationDto, String end_name) {
         try (Session session = driver.session()) {
             // 1. 우선 나와 가장 거리가 가까운 점을 찾아온다. >> 성공
