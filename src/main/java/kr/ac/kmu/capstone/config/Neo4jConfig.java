@@ -12,7 +12,7 @@ public class Neo4jConfig {
     @Bean
     public Driver neo4jDriver() {
         try {
-            return GraphDatabase.driver("neo4j://friedkimchi.kdedevelop.com:7687", AuthTokens.basic("neo4j","friedkimchi"));
+            return GraphDatabase.driver("neo4j://27.113.54.21:7687", AuthTokens.basic("neo4j","friedkimchi"));
         } catch (Exception e) {
             // 연결 실패 시 예외 처리
             e.printStackTrace();
