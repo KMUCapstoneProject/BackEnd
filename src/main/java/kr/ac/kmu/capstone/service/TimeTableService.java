@@ -112,7 +112,6 @@ public class TimeTableService {
         return emptyTimeTableResponseList;
     }
 
-
     public void makeTimetableFromExcel(MultipartFile file) throws IOException {
         List<String> timetables = readExcel(file);
         parseStringList(timetables);
@@ -311,6 +310,7 @@ public class TimeTableService {
             String kr_dayofWeek = dayTimeMatcher.group("dayOfWeek");
             Integer num_dayofWeek = dayofWeekValue.get(kr_dayofWeek);
             DayOfWeek dayOfWeek = DayOfWeek.of(num_dayofWeek);
+            log.info(dayOfWeek.name());
 
             // LocalTime 형식의 시작 시간 출력
             String startTimeStr = dayTimeMatcher.group("startTime");
@@ -335,7 +335,7 @@ public class TimeTableService {
                 String building = input.substring(0,2); // 2글자 가져오기
                 //System.out.println("building: " + building);
                 if (input.contains("-")) {
-                    String classNum = input.substring(1,7);
+                    String classNum = input.substring(1,7); // 앞에 건물번호 붙여서
 
                     return TimeTableMakeDto.builder()
                             .building(building)
@@ -343,7 +343,7 @@ public class TimeTableService {
                             .build();
                 }
                 else {
-                    String classNum = input.substring(1,5); // 앞에 건물 번호 붙여서
+                    String classNum = input.substring(1,5);
 
                     return TimeTableMakeDto.builder()
                             .building(building)
