@@ -102,7 +102,7 @@ public class TimeTableService {
             }
 
             // 오늘 남은 강의가 없을 때
-            if (nextClassStartTime != null && nextClassStartTime.isBefore(LocalTime.of(14, 30)))
+            if (nextClassStartTime != null && nextClassStartTime.isBefore(LocalTime.now()))
                 nextClassStartTime = null;
 
 
