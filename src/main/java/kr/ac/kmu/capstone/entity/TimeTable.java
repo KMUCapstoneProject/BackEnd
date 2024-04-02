@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-
 @Getter
 @Entity
 @NoArgsConstructor
@@ -16,27 +13,20 @@ public class TimeTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="timetable_id")
+    @Column(name="id")
     private Long timetableId; //시퀀스
 
-    // 일요일(1), 월요일(2), 화요일(3), 수요일(4), 목요일(5), 금요일(6), 토요일(7)
-    // 월요일(0), 화요일(1), 수요일(2), 목요일(3), 금요일(4), 토요일(5), 일요일(6)
-    // getDayOfWeek()
-    private DayOfWeek week;
-    private LocalTime starttime;
-    private LocalTime endtime;
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER) //Many = timetable, One = user, 한 계정에 여러 개 timetable
+    @JoinColumn(name = "user_id")
+    private User user; // FK
 
-    // entity로 만들어서 불러오기?
-    private String building;
-    private String classNum;
-
+    @ManyToOne(targetEntity = SchoolTimeTable.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "timetable_id")
+    private SchoolTimeTable schoolTimeTable; // FK
 
     @Builder
-    public TimeTable(DayOfWeek week, LocalTime starttime, LocalTime endtime, String classNum, String building) {
-        this.week = week;
-        this.starttime = starttime;
-        this.endtime = endtime;
-        this.classNum = classNum;
-        this.building = building;
+    public TimeTable(User user, SchoolTimeTable schoolTimeTable) {
+        this.user = user;
+        this.schoolTimeTable = schoolTimeTable;
     }
 }

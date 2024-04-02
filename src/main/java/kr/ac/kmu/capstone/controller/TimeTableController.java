@@ -1,13 +1,23 @@
 package kr.ac.kmu.Capstone.controller;
 
 import jakarta.validation.Valid;
+import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
+import kr.ac.kmu.Capstone.dto.timetable.SchoolTimeTableSearchDto;
+import kr.ac.kmu.Capstone.dto.timetable.TimeTableEmptyResponseDto;
+import kr.ac.kmu.Capstone.dto.timetable.PersonalTimetableSaveDto;
 import kr.ac.kmu.Capstone.dto.timetable.TimeTableResponseDto;
-import kr.ac.kmu.Capstone.dto.timetable.TimetableSaveDto;
+import kr.ac.kmu.Capstone.entity.SchoolTimeTable;
+import kr.ac.kmu.Capstone.entity.User;
+import kr.ac.kmu.Capstone.service.PersonalTimeTableService;
+import kr.ac.kmu.Capstone.service.SchoolTimeTableService;
 import kr.ac.kmu.Capstone.service.TimeTableService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +30,8 @@ import java.util.List;
 @AllArgsConstructor
 public class TimeTableController {
 
+    private SchoolTimeTableService schoolTimeTableService;
+    private PersonalTimeTableService personalTimeTableService;
     private TimeTableService timeTableService;
 
 
@@ -27,25 +39,64 @@ public class TimeTableController {
     @PostMapping("/excelupload")
     public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
-        timeTableService.makeTimetableFromExcel(file);
-        return new ResponseEntity(HttpStatus.CREATED);
-    }
+        schoolTimeTableService.makeTimetableFromExcel(file);
 
-    // 시간 하나씩 저장
-    @PostMapping("/add")
-    public ResponseEntity save(@Valid @RequestBody TimetableSaveDto timetableSaveDto){
-        timeTableService.save(timetableSaveDto);
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
 
     // 현재 시간과 비교해서 빈강의실 찾기 (현재 위치 건물에서)
-    @GetMapping("/findClassinBuilding")
-    public ResponseEntity findClassinBuilding(@RequestParam String building) {
+    @GetMapping("/findEmptyClassinBuilding")
+    public ResponseEntity findEmptyClassinBuilding(@RequestParam String building) {
 
-        List<TimeTableResponseDto> emptyRooms = timeTableService.findEmptyClass(building);
+        List<TimeTableEmptyResponseDto> emptyRooms = schoolTimeTableService.findEmptyClass(building);
         return new ResponseEntity(emptyRooms, HttpStatus.OK);
     }
 
+
+    // 개인 시간표 입력 기능
+    // 시간표 하나씩 저장
+    @PostMapping("/addPersonal")
+    public ResponseEntity save(@Valid @RequestBody PersonalTimetableSaveDto timetableSaveDto, @AuthenticationPrincipal CustomUserDetails customUserDetails, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for(FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        User user = customUserDetails.getUser();
+        personalTimeTableService.save(timetableSaveDto, user);
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    // 본인 시간표에 학교 시간표 불러와서 저장
+    @PostMapping("/addSchool")
+    public ResponseEntity save(Long timetableId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        User user = customUserDetails.getUser();
+        timeTableService.add(timetableId, user);
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+
+    // 본인 시간표 불러오기
+    @PostMapping("/loadbyUser")
+    public ResponseEntity myTimeTable(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
+        List<TimeTableResponseDto> myTimeTable = timeTableService.loadAllMyTimeTable(user);
+        return new ResponseEntity(myTimeTable, HttpStatus.OK);
+    }
+
+    // 시간표 검색
+    @PostMapping("/searchSchool")
+    public ResponseEntity search(@Valid @RequestBody SchoolTimeTableSearchDto timetableSearchDto, BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            List<FieldError> list = bindingResult.getFieldErrors();
+            for(FieldError error : list) {
+                return new ResponseEntity<>(error.getDefaultMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        List<SchoolTimeTable> result = timeTableService.search(timetableSearchDto);
+        return new ResponseEntity(result, HttpStatus.CREATED);
+    }
 
 }

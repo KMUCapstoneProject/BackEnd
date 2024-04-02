@@ -16,4 +16,8 @@ public class TimeTableMakeDto {
 
     private String building;
     private String classNum;
+
+    private String lectureNum;
+    private String lectureName;
+
 }

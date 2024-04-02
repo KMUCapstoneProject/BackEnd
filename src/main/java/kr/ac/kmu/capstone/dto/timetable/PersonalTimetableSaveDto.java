@@ -1,8 +1,8 @@
 package kr.ac.kmu.Capstone.dto.timetable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import kr.ac.kmu.Capstone.entity.TimeTable;
-import lombok.Builder;
+import kr.ac.kmu.Capstone.entity.PersonalTimeTable;
+import kr.ac.kmu.Capstone.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TimetableSaveDto {
+public class PersonalTimetableSaveDto {
 
     private DayOfWeek week;
 
@@ -25,25 +25,23 @@ public class TimetableSaveDto {
     private LocalTime endtime;
 
     private String classNum;
-
     private String building;
 
-    public TimeTable toEntity() {
-        return TimeTable.builder()
+    private String lectureNum;
+    private String lectureName;
+
+
+    public PersonalTimeTable toEntity(User user) {
+        return PersonalTimeTable.builder()
+                .user(user)
                 .week(week)
                 .starttime(starttime)
                 .endtime(endtime)
                 .classNum(classNum)
                 .building(building)
+                .lectureNum(lectureNum)
+                .lectureName(lectureName)
                 .build();
     }
 
-    @Builder
-    public TimetableSaveDto(DayOfWeek week, LocalTime starttime, LocalTime endtime, String classNum, String building) {
-        this.week = week;
-        this.starttime = starttime;
-        this.endtime = endtime;
-        this.classNum = classNum;
-        this.building = building;
-    }
 }

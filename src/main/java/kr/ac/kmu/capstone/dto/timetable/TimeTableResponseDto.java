@@ -1,17 +1,23 @@
 package kr.ac.kmu.Capstone.dto.timetable;
 
+import lombok.Builder;
 import lombok.Getter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Getter
+@Builder
 public class TimeTableResponseDto {
 
-    String classNum;
-    LocalTime nextStartTime;
+    private DayOfWeek week;
+    private LocalTime starttime;
+    private LocalTime endtime;
 
-    public TimeTableResponseDto(String classNum, LocalTime nextStartTime) {
-        this.classNum = classNum;
-        this.nextStartTime = nextStartTime;
-    }
+    private String building;
+    private String classNum;
+
+    private String lectureNum;
+    private String lectureName;
+
 }
