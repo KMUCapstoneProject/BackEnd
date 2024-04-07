@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,6 +91,19 @@ public class TimeTableService {
             searched = schoolTimeTableRepository.findByLectureNameContaining(keyword);
         }
         return searched;
+    }
+
+    // mytimetable 안에서 특정 요일만
+    public List<TimeTableResponseDto> myTimeTablebyWeek(List<TimeTableResponseDto> mytimetable, Integer week) {
+
+        List<TimeTableResponseDto> result = new ArrayList<>();
+
+        for (TimeTableResponseDto myt : mytimetable) {
+            if (myt.getWeek().equals(DayOfWeek.of(week))) {
+                result.add(myt);
+            }
+        }
+        return  result;
     }
 
 }

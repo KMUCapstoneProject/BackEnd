@@ -86,6 +86,16 @@ public class TimeTableController {
         return new ResponseEntity(myTimeTable, HttpStatus.OK);
     }
 
+    // 본인시간표에서 특정 요일 선택해서 받아오도록
+    // 1:월, 2:화, 3:수, 4:목, 5:금, 6:토, 7:일
+    @PostMapping("/loadbyUserbyWeek")
+    public ResponseEntity myTimeTablebyWeek(Integer week, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
+        List<TimeTableResponseDto> myTimeTable = timeTableService.loadAllMyTimeTable(user);
+        List<TimeTableResponseDto> result = timeTableService.myTimeTablebyWeek(myTimeTable, week);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
     // 시간표 검색
     @PostMapping("/searchSchool")
     public ResponseEntity search(@Valid @RequestBody SchoolTimeTableSearchDto timetableSearchDto, BindingResult bindingResult){
