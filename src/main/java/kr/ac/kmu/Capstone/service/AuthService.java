@@ -42,21 +42,19 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public AuthApiResponse login(UserLoginTarget userLoginTarget) {
+    public String login(UserLoginTarget userLoginTarget) {
 
         User user = userRepository.findByEmail(userLoginTarget.getEmail())
             .orElseThrow(() -> new NullPointerException(ErrorCode.ID_NOT_EXIST.getMessage()));
         //user.changeDeviceToken(userLoginTarget.getDeviceToken());
 
-        log.info("whereistheprob1");
 
         UsernamePasswordAuthenticationToken authenticationToken = userLoginTarget.toAuthentication();
         log.info("1");
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         log.info("2");
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        log.info("whereistheprob2");
+        String accesstoken = tokenDto.getAccessToken();
 
         RefreshToken refreshToken = RefreshToken.builder()
             .refreshKey(authentication.getName())
@@ -64,7 +62,8 @@ public class AuthService {
             .build();
 
         refreshTokenRepository.save(refreshToken);
-        return AuthApiResponse.of(user,tokenDto);
+        //return AuthApiResponse.of(user,tokenDto);
+        return accesstoken;
     }
 
     public AuthApiResponse reissue(TokenRequestDto tokenRequestDto) {

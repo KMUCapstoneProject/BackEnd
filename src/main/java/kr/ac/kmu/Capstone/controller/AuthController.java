@@ -35,11 +35,12 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
-		AuthApiResponse tokenDto = authService.login(userLoginRequest.toParam());
-		log.info("where");
-		ApiResponse apiResponse = ApiResponse.responseData(StatusCode.SUCCESS,
-			SuccessCode.USER_LOGIN_SUCCESS.getMessage(),tokenDto);
-		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//		AuthApiResponse tokenDto = authService.login(userLoginRequest.toParam());
+//		ApiResponse apiResponse = ApiResponse.responseData(StatusCode.SUCCESS,
+//			SuccessCode.USER_LOGIN_SUCCESS.getMessage(),tokenDto);
+//		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+		String accessToken = authService.login(userLoginRequest.toParam());
+		return ResponseEntity.status(HttpStatus.OK).body(accessToken);
 	}
 
 	@PostMapping("/reissue")
