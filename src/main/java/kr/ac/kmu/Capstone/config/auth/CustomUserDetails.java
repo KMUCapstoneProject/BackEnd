@@ -3,14 +3,16 @@ package kr.ac.kmu.Capstone.config.auth;
 import kr.ac.kmu.Capstone.entity.Role;
 import kr.ac.kmu.Capstone.entity.User;
 import lombok.Getter;
+import org.apache.catalina.security.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class CustomUserDetails implements UserDetails/*, OAuth2User*/ {
@@ -42,6 +44,34 @@ public class CustomUserDetails implements UserDetails/*, OAuth2User*/ {
         return collect;
     }*/
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
+
+
+    // getCurrentUsername 메소드의 역할은 Security Cont
+    public static Optional<String> getCurrentUsername() {
+
+        // authentication객체가 저장되는 시점은 JwtFilter의 doFilter 메소드에서
+        // Request가 들어올 때 SecurityContext에 Authentication 객체를 저장해서 사용
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            logger.debug("Security Context에 인증 정보가 없습니다.");
+            return Optional.empty();
+        }
+
+        String username = null;
+        if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
+            username = springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof String) {
+            username = (String) authentication.getPrincipal();
+        }
+
+        return Optional.ofNullable(username);
+    }
+
+
+
+
 
     private GrantedAuthority getAuthority(Role role) {
         return new SimpleGrantedAuthority("ROLE_" + role);
@@ -52,9 +82,9 @@ public class CustomUserDetails implements UserDetails/*, OAuth2User*/ {
         List<GrantedAuthority> authorityList = new ArrayList<>();
 
         switch (user.getRoles()) {
-            case ADMIN : authorityList.add(getAuthority(Role.ADMIN));
-            case MANAGER : authorityList.add(getAuthority(Role.MANAGER));
-            case USER : authorityList.add(getAuthority(Role.USER));
+            case ADMIN: authorityList.add(getAuthority(Role.ADMIN));
+            case MANAGER: authorityList.add(getAuthority(Role.MANAGER));
+            case USER: authorityList.add(getAuthority(Role.USER));
         }
 
         return authorityList;
@@ -68,6 +98,10 @@ public class CustomUserDetails implements UserDetails/*, OAuth2User*/ {
     @Override
     public String getUsername() {
         return user.getNickname();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
     }
 
     //	public String getNickname() {

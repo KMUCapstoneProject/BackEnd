@@ -1,34 +1,23 @@
 package kr.ac.kmu.Capstone.dto.user;
 
-import lombok.*;
+import kr.ac.kmu.Capstone.entity.Role;
+import kr.ac.kmu.Capstone.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
-@ToString
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserResponseDto {
-
-    private Long id;
-    private String nickname;
+    private long id;
     private String email;
-    private String role;
+    private String nickname;
+    private Role authority;
 
-/*    public User toEntity(Role roles){
-        User user = User.builder()
-                .id(id)
-                .nickname(nickname)
-                .email(email)
-                .roles(roles)
-                .build();
-        return user;
-    }*/
-
-    @Builder
-    public UserResponseDto(Long id, String nickname, String email, String role) {
-        this.id = id;
-        this.nickname = nickname;
-        this.email = email;
-        this.role = role;
+    public static UserResponseDto of(User user) {
+        return new UserResponseDto(user.getId(), user.getEmail(), user.getNickname(), user.getRoles());
     }
-
 }

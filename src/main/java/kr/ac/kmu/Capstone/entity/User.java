@@ -1,14 +1,15 @@
 package kr.ac.kmu.Capstone.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "user")
+@Entity
+@ToString
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -18,23 +19,36 @@ public class User {
 
     @Column(unique = true)
     private String email;
-    //das
+
     private String password;
 
     @Column(unique = true)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = false)
     private Role roles;
 
-    @Builder
-    public User(Long id, String email, String password, String nickname, Role roles) {
-        this.id = id;
-        this.email = email;
+
+
+    public void changePassword(String password) {
         this.password = password;
-        this.nickname = nickname;
-        this.roles = roles;
     }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+
+
+//    @Builder
+//    public User(Long id, String email, String password, String nickname, Role roles) {
+//        this.id = id;
+//        this.email = email;
+//        this.password = password;
+//        this.nickname = nickname;
+//        this.roles = roles;
+//    }
 
     public void update(String password, String nickname){
         this.password = password;

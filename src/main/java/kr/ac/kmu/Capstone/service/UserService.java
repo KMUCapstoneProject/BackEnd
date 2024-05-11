@@ -1,17 +1,13 @@
 package kr.ac.kmu.Capstone.service;
 
-import jakarta.servlet.http.HttpSession;
-import kr.ac.kmu.Capstone.dto.user.LoginDto;
-import kr.ac.kmu.Capstone.dto.user.SignupDto;
-import kr.ac.kmu.Capstone.dto.user.UserResponseDto;
-import kr.ac.kmu.Capstone.dto.user.UserUpdateDto;
-import kr.ac.kmu.Capstone.entity.Posting;
+import kr.ac.kmu.Capstone.config.common.response.ErrorCode;
+import kr.ac.kmu.Capstone.dto.user.*;
 import kr.ac.kmu.Capstone.entity.Role;
 import kr.ac.kmu.Capstone.entity.User;
+import kr.ac.kmu.Capstone.repository.RefreshTokenRepository;
 import kr.ac.kmu.Capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,55 +15,79 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final RefreshTokenRepository refreshTokenRepository;
 
-    private final UserRepository userRepository;
 
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	public UserResponseDto changePassword(ModifyPasswordTarget target, String email) {
+		validUser(target.getEmail(), email);
+		User user = findUserByEmail(target.getEmail());
+		user.changePassword(passwordEncoder.encode(target.getPassword()));
 
-    public User getUserInfo(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.get();
-    }
+		return UserResponseDto.of(userRepository.save(user));
+	}
 
-    public User joinUser(SignupDto signupDTO){
-        signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
-        return userRepository.save(signupDTO.toEntity());
-    }
 
-    public boolean checkUser(String email, User user) {
+	public UserResponseDto changeNickname(ModifyNicknameTarget target, String email) {
+		validUser(target.getEmail(), email);
+		User user = findUserByEmail(target.getEmail());
+		user.changeNickname(target.getNickname());
+		return UserResponseDto.of(userRepository.save(user));
+	}
 
-        if (email == user.getEmail()) {
-            return true;
-        }
-        return false;
-    }
 
-    public Boolean checkEmailDuplicate(String email) {
-        return userRepository.existsByEmail(email);
-    }
+	public void deleteUser(DeleteUserTarget target, String email) {
+		User user = findUserByEmail(target.getEmail());
 
-    @Transactional
-    public void update(UserUpdateDto dto){
+		validUser(target.getEmail(), email);
+		validPassword(target.getPassword(), user.getPassword());
 
-        User user = userRepository.findByEmail(dto.getEmail()).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지않습니다.")
-        );
+		userRepository.deleteById(user.getId());
+		refreshTokenRepository.deleteById(String.valueOf(user.getId()));
+	}
 
-        // 암호화되지않은 비번이 들어온다
-        if(passwordEncoder.matches(dto.getPassword(), user.getPassword())){
-            user.update(user.getPassword(), dto.getNickname());
-        }
-        else{
-            String encodePW = passwordEncoder.encode(dto.getPassword());
-            user.update(encodePW, dto.getNickname());
-        }
-    }
 
-    @Transactional
+//	@Override
+//	public UserApiResponse saveDeviceToken(ReSaveDeviceTokenTarget reSaveDeviceTokenTarget) {
+//		User user = findUserByEmail(reSaveDeviceTokenTarget.getEmail());
+//
+//		user.changeDeviceToken(reSaveDeviceTokenTarget.getDeviceToken());
+//		userRepository.save(user);
+//
+//		return UserApiResponse.of(user);
+//	}
+
+	// 현재 SecurityContext 에 있는 유저 정보 가져오기
+
+	public FindUserInfoResponse getMyInfo(String email, User user) {
+		validUser(email, user.getEmail());
+		return FindUserInfoResponse.of(user);
+	}
+
+	private User findUserByEmail(String email) {
+		return userRepository.findByEmail(email)
+			.orElseThrow(() -> new NullPointerException(ErrorCode.ID_NOT_EXIST.getMessage()));
+	}
+
+	private void validUser(String email, String eamil2) {
+		if (email != eamil2) {
+			throw new SecurityException(ErrorCode.ID_NOT_MATCH.getMessage());
+		}
+	}
+
+	private void validPassword(String requestPassword, String encodedPassword) {
+		if (!passwordEncoder.matches(requestPassword, encodedPassword)) {
+			throw new SecurityException(ErrorCode.PASSWORD_NOT_MATCH.getMessage());
+		}
+	}
+
+	@Transactional
     public void updateStatusToManager(String email) {
         User user = getInfo(email);
         user.setRoles(Role.MANAGER);
@@ -84,7 +104,7 @@ public class UserService {
         return user.get();
     }
 
-    public List<UserResponseDto> getAllUserInfo() {
+	public List<UserResponseDto> getAllUserInfo() {
         List<User> userList = userRepository.findAll();
         List<UserResponseDto> userDtoList = new ArrayList<>();
         for (User user : userList) {
@@ -92,7 +112,7 @@ public class UserService {
                     .id(user.getId())
                     .nickname(user.getNickname())
                     .email(user.getEmail())
-                    .role(user.getRoleKey())
+					.authority(user.getRoles())
                     .build();
 
             //log.info(String.valueOf(user.getId()));

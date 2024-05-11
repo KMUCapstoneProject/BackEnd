@@ -1,7 +1,6 @@
 package kr.ac.kmu.Capstone.controller;
 
 import kr.ac.kmu.Capstone.config.auth.CustomUserDetails;
-import kr.ac.kmu.Capstone.config.auth.PrincipalDetails;
 import kr.ac.kmu.Capstone.dto.message.MessageDto;
 import kr.ac.kmu.Capstone.entity.User;
 import kr.ac.kmu.Capstone.response.Response;
@@ -36,10 +35,9 @@ public class MessageController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/messages/received/{id}")
-    public Response<?> deleteReceivedMessage(@PathVariable("id") Integer id, Authentication authentication) {
+    public Response<?> deleteReceivedMessage(@PathVariable("id") Integer id, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        User user = principalDetails.getUser();
+        User user = customUserDetails.getUser();
 
         MessageDto messageDto = messageService.findMessageById(id);
 
