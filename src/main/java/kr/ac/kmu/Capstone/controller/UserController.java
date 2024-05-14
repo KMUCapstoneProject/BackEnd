@@ -29,6 +29,12 @@ public class UserController {
         return "hello";
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> getinfo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
 //    //@AuthRequired
 //    @PostMapping("/password/{email}")
 //    public ResponseEntity<?> modifyPassword(@PathVariable String email, @Valid @RequestBody ModifyPasswordRequest dto,
