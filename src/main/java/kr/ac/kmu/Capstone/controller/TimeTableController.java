@@ -109,4 +109,24 @@ public class TimeTableController {
         return new ResponseEntity(result, HttpStatus.CREATED);
     }
 
+    @GetMapping("/personalDelete")
+    public ResponseEntity deletePersonalTimetableById(@RequestParam("id") Long timetableId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
+        if (!personalTimeTableService.checkUserinPersonal(user.getId(), timetableId)) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        personalTimeTableService.deletePersonalTimetable(timetableId);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/schoolDelete")
+    public ResponseEntity deleteTimetableById(@RequestParam("id") Long timetableId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        User user = customUserDetails.getUser();
+        if (!personalTimeTableService.checkUserinTimetable(user.getId(), timetableId)) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        personalTimeTableService.deleteTimetable(timetableId);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
 }
