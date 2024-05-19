@@ -37,6 +37,7 @@ public class TimeTableService {
         List<TimeTable> mySchoolSearched = timeTableRepository.findByUser(user);
         for (TimeTable timeTable : mySchoolSearched) {
             TimeTableResponseDto timeTableResponseDto = TimeTableResponseDto.builder()
+                    .id(timeTable.getTimetableId())
                     .week(timeTable.getSchoolTimeTable().getWeek())
                     .starttime(timeTable.getSchoolTimeTable().getStarttime())
                     .endtime(timeTable.getSchoolTimeTable().getEndtime())
@@ -52,6 +53,7 @@ public class TimeTableService {
         List<PersonalTimeTable> myPersonalSearched = personalTimeTableRepository.findByUser(user);
         for (PersonalTimeTable personalTimeTable : myPersonalSearched) {
             TimeTableResponseDto timeTableResponseDto = TimeTableResponseDto.builder()
+                    .id(personalTimeTable.getTimetableId())
                     .week(personalTimeTable.getWeek())
                     .starttime(personalTimeTable.getStarttime())
                     .endtime(personalTimeTable.getEndtime())

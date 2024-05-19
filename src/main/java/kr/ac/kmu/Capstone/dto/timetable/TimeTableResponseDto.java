@@ -10,6 +10,8 @@ import java.time.LocalTime;
 @Builder
 public class TimeTableResponseDto {
 
+    private Long id;
+
     private DayOfWeek week;
     private LocalTime starttime;
     private LocalTime endtime;
