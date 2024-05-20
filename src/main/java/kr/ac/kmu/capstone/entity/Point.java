@@ -1,14 +1,14 @@
 package kr.ac.kmu.capstone.entity;
 
 import lombok.Getter;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
+import org.neo4j.driver.types.Path;
+import org.springframework.data.neo4j.core.schema.*;
+
+import java.util.Set;
 
 @Getter
 @Node("point")
-public class Location {
+public class Point {
 
     @Id
     @GeneratedValue
@@ -20,13 +20,16 @@ public class Location {
     @Property(name="longitude")
     private double longitude;
 
-    public Location() {
+    @Relationship(type = "status")
+    private Set<Path> paths;
+
+    public Point() {
         this.name = null;
         this.latitude = 0.0;
         this.longitude = 0.0;
     }
 
-    public Location(String name, double latitude, double longitude) {
+    public Point(String name, double latitude, double longitude) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -37,7 +40,7 @@ public class Location {
         return name;
     }
 
-    public Location setName(String name) {
+    public Point setName(String name) {
         this.name = name;
         return this;
     }
@@ -46,7 +49,7 @@ public class Location {
         return latitude;
     }
 
-    public Location setLatitude(double latitude) {
+    public Point setLatitude(double latitude) {
         this.latitude = latitude;
         return this;
     }
@@ -55,8 +58,16 @@ public class Location {
         return longitude;
     }
 
-    public Location setLongitude(double longitude) {
+    public Point setLongitude(double longitude) {
         this.longitude = longitude;
         return this;
+    }
+
+    public Set<Path> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(Set<Path> paths) {
+        this.paths = paths;
     }
 }

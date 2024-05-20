@@ -1,19 +1,18 @@
 package kr.ac.kmu.capstone.dto.location;
 
-public class LocationDto {
+public class PointDto {
 
     private  String name;
-
     private  double latitude;
     private  double longitude;
 
-    public LocationDto() {
+    public PointDto() {
         name = "";
         latitude = 0;
         longitude = 0;
     }
 
-    public LocationDto(String name, double latitude, double longitude) {
+    public PointDto(String name, double latitude, double longitude) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -31,17 +30,17 @@ public class LocationDto {
         return longitude;
     }
 
-    public LocationDto setName(String name) {
+    public PointDto setName(String name) {
         this.name = name;
         return this;
     }
 
-    public LocationDto setLatitude(double latitude) {
+    public PointDto setLatitude(double latitude) {
         this.latitude = latitude;
         return this;
     }
 
-    public LocationDto setLongitude(double longitude) {
+    public PointDto setLongitude(double longitude) {
         this.longitude = longitude;
         return this;
     }
