@@ -53,6 +53,8 @@ public class SubwayController {
 
     @Scheduled(fixedRate = 60000)
     public void scheduleGetNextSchedule() {
+        subwayTimeApiService.getSubwayScheduleList().clear();
+
         String[][] subwayStationPairs = {
                 {"계명대", "강창"},
                 {"강창", "계명대"},
