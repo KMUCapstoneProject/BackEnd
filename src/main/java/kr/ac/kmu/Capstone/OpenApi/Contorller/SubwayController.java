@@ -41,7 +41,7 @@ public class SubwayController {
     @Autowired
     private SubwayTimeApiService subwayTimeApiServices;
 
-   /* @GetMapping("/subway-schedules")
+    @GetMapping("/subway-schedules")
     public ResponseEntity<List<String>> getSubwaySchedule() {
         List<String> scheduleList = subwayTimeApiServices.getSubwayScheduleList();
         if (scheduleList != null && !scheduleList.isEmpty()) {
@@ -65,7 +65,7 @@ public class SubwayController {
             String directionStationNm = pair[1];
             subwayTimeApiService.logSubwaySchedule(subwayStationNm, directionStationNm);
         }
-    }*/
+    }
 
     @GetMapping("/subwaySchedulegetTime")
     public ResponseEntity<SubwayScheduleResponseDTO> getNextSchedule(
