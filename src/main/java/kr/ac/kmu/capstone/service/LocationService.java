@@ -12,6 +12,7 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +176,7 @@ public class LocationService {
         return relationships;
     }
 
+    @Transactional
     public void createNode(PointDto pointDto) {
         try (Session session = driver.session()) {
             //create(n:point {name : '본관', latitude : 35.85579, longitude : 128.48889})
@@ -190,6 +192,7 @@ public class LocationService {
         }
     }
 
+    @Transactional
     public void createStatus(StatusDto statusDto) {
         try (Session session = driver.session()) {
             //MATCH (a:point {name: '본관_A'}), (b:point {name: '본관12_A'})
@@ -215,7 +218,7 @@ public class LocationService {
             System.out.println("success");
         }
     }
-
+    @Transactional
     public void deleteNode(String name) {
         try (Session session = driver.session()) {
             // MATCH (n) WHERE n.name = 'test3' DELETE n
@@ -228,6 +231,7 @@ public class LocationService {
         }
     };
 
+    @Transactional
     public void deleteStatus(String start_name, String end_name) {
         // MATCH (n1 {name: 'test1'})-[r:status]-(n2 {name: 'test2'}) DELETE r
         try (Session session = driver.session()) {
