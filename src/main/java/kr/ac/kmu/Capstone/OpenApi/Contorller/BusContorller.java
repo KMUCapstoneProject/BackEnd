@@ -27,7 +27,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static kr.ac.kmu.Capstone.OpenApi.OpenApiInfo.OpenApiServiceKey.SERVICE_KEY;
 
@@ -43,6 +45,44 @@ public class BusContorller {
     @Autowired
     private BusArrivalInfoStorage storage;
 
+    private static final Map<String, String> busRoutes = new HashMap<>();
+
+    static {
+        busRoutes.put("DGB4070002000", "성서2(대천-대평-대천)");
+        busRoutes.put("DGB4070002003", "성서2(대천-하산스무지-대천)");
+        busRoutes.put("DGB4070002006", "성서2(대천-강정-육신사-강정-대천)");
+        busRoutes.put("DGB4070002016", "성서2(대천-대평-서문시장)");
+        busRoutes.put("DGB4070002018", "성서2(서문시장-대평-대천)");
+        busRoutes.put("DGB4070002021", "성서2(대천-하산스무지(육신사)-대천)");
+        busRoutes.put("DGB4070002026", "성서2(대천-기곡(육신사,도채)-대천)");
+        busRoutes.put("DGB4070002027", "성서2(대천-강정-기곡(육신사,도채)-강정-대천)");
+        busRoutes.put("DGB4070002033", "성서2(서문시장-하산스무지-대천)");
+        busRoutes.put("DGB4070002034", "성서2(서문시장-하산스무지-서문시장)");
+        busRoutes.put("DGB4070002050", "성서2(대천-문산-하산스무지-대천)");
+        busRoutes.put("DGB4070002060", "성서2(대천-하산스무지-문산-서문시장)");
+        busRoutes.put("DGB4070002023", "성서2(대천-하산스무지(대구보훈요양원)-대천)");
+        busRoutes.put("DGB4070002022", "성서2(대천-기곡(대평,상당,터실)-대천)");
+        busRoutes.put("DGB3000523000", "523(원대오거리 방면)");
+        busRoutes.put("DGB3000523001", "523(동산네거리 방면)");
+        busRoutes.put("DGB3000527000", "527");
+        busRoutes.put("DGB3000564000", "564");
+        busRoutes.put("DGB3000655000", "655");
+        busRoutes.put("DGB1000001000", "급행1");
+        busRoutes.put("DGB4070001000", "성서1");
+        busRoutes.put("DGB4030005000", "달서5");
+        busRoutes.put("DGB3000503000", "503");
+        busRoutes.put("DGB3000425000", "425");
+        busRoutes.put("DGB3001725000", "7250");
+        busRoutes.put("DGB4030003001", "달서3");
+        busRoutes.put("DGB1000007000", "급행7");
+        busRoutes.put("DGB1000005000", "급행5");
+        busRoutes.put("DGB4070001100", "성서1-1");
+        busRoutes.put("DGB3000405000", "405");
+        busRoutes.put("DGB3000524000", "524");
+        busRoutes.put("DGB4030001000", "달서1");
+    }
+
+
     @GetMapping("/bus-arrival-info")
     public List<BusApiServiceItem> getBusArrivalInfo() {
        return storage.getBusArrivalInfoList();
@@ -57,7 +97,17 @@ public class BusContorller {
             ResponseEntity<BusApiServiceItems> responseEntity = callBusSttnAcctoArvlPrearngeInfoListApi("1", "10", nodeId);
             BusApiServiceItems busApiServiceItems = responseEntity.getBody();
             List<BusApiServiceItem> sortedItems = busApiService.sortItemsByArrivalTime(busApiServiceItems.getBusApiServiceItem());
+
+            // 각 항목에 노선 정보를 추가합니다.
+            for (BusApiServiceItem item : sortedItems) {
+                String routeId = item.getRouteid();
+                if (busRoutes.containsKey(routeId)) {
+                    item.setRouteInfo(busRoutes.get(routeId));
+                }
+            }
+
             allBusArrivalInfo.addAll(sortedItems);
+
             logger.info("Received bus arrival info: {}", sortedItems);
         }
         storage.setBusArrivalInfoList(allBusArrivalInfo);

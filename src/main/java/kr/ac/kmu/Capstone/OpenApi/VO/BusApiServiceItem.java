@@ -42,4 +42,7 @@ public class BusApiServiceItem {
     @JsonProperty("vehicletp")
     private String vehicletp;
 
+    // 노선 정보
+    private String routeInfo;
+
 }

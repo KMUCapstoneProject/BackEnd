@@ -92,9 +92,10 @@ public class SubwayScheduleResponseDTO {
                 ", endStation='" + endStation + '\'' +
                 ", dayOfWeek='" + dayOfWeek + '\'' +
                 ", travelTime=" + travelTime +
-                ", timeUntilNextTrain=" + timeUntilNextTrain +
-                ", secondNextTrain=" + secondNextTrain +
-                ", thirdNextTrain=" + thirdNextTrain +
+                ", timeUntilNextTrain=" + timeUntilNextTrain + '\'' +
+                ", secondNextTrain=" + secondNextTrain + '\'' +
+                ", thirdNextTrain=" + thirdNextTrain + '\'' +
+                ", fourthNextTrain=" + fourthNextTrain + '\'' +
                 '}';
     }
 }

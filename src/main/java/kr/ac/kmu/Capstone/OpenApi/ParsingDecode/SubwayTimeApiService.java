@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +25,9 @@ public class SubwayTimeApiService {
     private SubwayRepository subwayTimeRepository;
 
     private List<String> scheduleList = new ArrayList<>();
+
+    private List<Map<String, List<String>>> scheduleLists = new ArrayList<>();
+
     private static final Logger logger = LoggerFactory.getLogger(SubwayTimeApiService.class);
 
     public void saveSubwayTimeItems(List<SubwayTimeApiServiceItem> items) {
@@ -105,33 +106,58 @@ public class SubwayTimeApiService {
         String upDownTypeCode = determineUpDownType(subwayStationNm, directionStationNm);
         SubwayScheduleResponseDTO scheduleResponse = getTravelTime(subwayStationNm, directionStationNm, dailyTypeCode, upDownTypeCode);
 
+
+
         if (scheduleResponse.getTravelTime() != -1) {
             String formattedTimeUntilNextTrain1 = formatSecondsToHMS(scheduleResponse.getTimeUntilNextTrain());
             String formattedTimeUntilNextTrain2 = scheduleResponse.getSecondNextTrain() != -1 ? formatSecondsToHMS(scheduleResponse.getSecondNextTrain()) : "N/A";
             String formattedTimeUntilNextTrain3 = scheduleResponse.getThirdNextTrain() != -1 ? formatSecondsToHMS(scheduleResponse.getThirdNextTrain()) : "N/A";
             String formattedTimeUntilNextTrain4 = scheduleResponse.getfourthNextTrain() != -1 ? formatSecondsToHMS(scheduleResponse.getfourthNextTrain()) : "N/A";
 
+            String schedule = String.format("Subway from %s to %s", subwayStationNm, directionStationNm);
+            scheduleList.add(schedule);
 
             logger.info("Time until next train from {}: {}", subwayStationNm, formattedTimeUntilNextTrain1);
             logger.info("Time until second next train from {}: {}", subwayStationNm, formattedTimeUntilNextTrain2);
             logger.info("Time until third next train from {}: {}", subwayStationNm, formattedTimeUntilNextTrain3);
             logger.info("Time until third next train from {}: {}", subwayStationNm, formattedTimeUntilNextTrain4);
 
-
             String logMessage = String.format(
-                    "Time until next train from %s to %s: %s, Time until second next train: %s, Time until third next train: %s,Time until fourth next train: %s",
-                    subwayStationNm, directionStationNm, formattedTimeUntilNextTrain1, formattedTimeUntilNextTrain2, formattedTimeUntilNextTrain3, formattedTimeUntilNextTrain4
+                    "{ %s역" +
+                            "\n%s," +
+                            "\n%s," +
+                            "\n%s," +
+                            "\n%s" + "}",
+                    subwayStationNm,
+                    formattedTimeUntilNextTrain1,
+                    formattedTimeUntilNextTrain2,
+                    formattedTimeUntilNextTrain3,
+                    formattedTimeUntilNextTrain4
             );
+            /*
+            String logMessage = String.format(
+                    "Time until next train from %s to %s: %s, " + "Time until second next train: %s, Time until third next train: %s,Time until fourth next train: %s",
+                    subwayStationNm, directionStationNm, formattedTimeUntilNextTrain1, formattedTimeUntilNextTrain2, formattedTimeUntilNextTrain3, formattedTimeUntilNextTrain4
+            );*/
             scheduleList.add(logMessage);
             logger.info(logMessage);
-        } else {
-            logger.info("Could not find travel time from {} to {}", subwayStationNm, directionStationNm);
+
+            List<String> times = Arrays.asList(formattedTimeUntilNextTrain1, formattedTimeUntilNextTrain2, formattedTimeUntilNextTrain3, formattedTimeUntilNextTrain4);
+
+            Map<String, List<String>> scheduleEntry = new HashMap<>();
+            scheduleEntry.put(subwayStationNm, times);
+
+            scheduleLists.add(scheduleEntry);
         }
 
-        String schedule = String.format("Subway from %s to %s", subwayStationNm, directionStationNm);
-        scheduleList.add(schedule);
+        else {
+            logger.info("Could not find travel time from {} to {}", subwayStationNm, directionStationNm);
+        }
     }
 
+    public List<Map<String, List<String>>> getSubwayScheduleLists() {
+        return scheduleLists;
+    }
     public List<String> getSubwayScheduleList() {
         return scheduleList;
     }
