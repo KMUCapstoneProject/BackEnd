@@ -159,7 +159,7 @@ public class SubwayTimeApiService {
             scheduleList.add(schedule);
 
             String logMessage = String.format(
-                    "Time until next train from %s to %s: %s, Time until second next train: %s, Time until third next train: %s, Time until fourth next train: %s",
+                    "Time until next train from %s to %s:1%s, Time until second next train:2%s, Time until third next train: 3%s, Time until fourth next train: 4%s",
                     subwayStationNm, directionStationNm, formattedTimeUntilNextTrain1, formattedTimeUntilNextTrain2, formattedTimeUntilNextTrain3, formattedTimeUntilNextTrain4
             );
 
