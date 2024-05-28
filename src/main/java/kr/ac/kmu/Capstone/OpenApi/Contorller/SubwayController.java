@@ -64,6 +64,25 @@ public class SubwayController {
         subwayTimeApiService.getSubwayScheduleList().clear();
 
         String[][] subwayStationPairs = {
+                {"계명대", "강창", "AA"},
+                {"강창", "계명대", "BB"},
+                {"계명대", "성서산업단지", "CC"},
+                {"강창", "대실", "DD"}
+        };
+
+        for (String[] pair : subwayStationPairs) {
+            String subwayStationNm = pair[0];
+            String directionStationNm = pair[1];
+            String identifier = pair[2];
+            subwayTimeApiService.logSubwaySchedule(subwayStationNm, directionStationNm, identifier);
+        }
+    }
+    /*
+    @Scheduled(fixedRate = 60000)
+    public void scheduleGetNextSchedule() {
+        subwayTimeApiService.getSubwayScheduleList().clear();
+
+        String[][] subwayStationPairs = {
                 {"계명대", "강창"},
                 {"강창", "계명대"},
                 {"계명대", "성서산업단지"},
@@ -75,7 +94,7 @@ public class SubwayController {
             String directionStationNm = pair[1];
             subwayTimeApiService.logSubwaySchedule(subwayStationNm, directionStationNm);
         }
-    }
+    }*/
 
     @GetMapping("/subwaySchedulegetTime")
     public ResponseEntity<SubwayScheduleResponseDTO> getNextSchedule(
