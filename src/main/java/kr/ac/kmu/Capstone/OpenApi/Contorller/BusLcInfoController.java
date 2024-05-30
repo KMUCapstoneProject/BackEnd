@@ -32,7 +32,7 @@ import static kr.ac.kmu.Capstone.OpenApi.OpenApiInfo.OpenApiServiceKey.SERVICE_K
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/user-service/api")
 public class BusLcInfoController {
     private final BusRouteAcctoSpcifySttnService BusRouteAcctoSpcifySttnService;
     private final BusRouteArvlService busRouteArvlService;

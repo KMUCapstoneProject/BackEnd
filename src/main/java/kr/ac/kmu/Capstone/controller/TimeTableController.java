@@ -26,7 +26,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/timetable")
+@RequestMapping("/user-service/api/timetable")
 @AllArgsConstructor
 public class TimeTableController {
 

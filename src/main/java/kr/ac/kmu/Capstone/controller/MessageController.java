@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/user-service")
 public class MessageController {
     private final MessageService messageService;
 

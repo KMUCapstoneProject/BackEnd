@@ -30,7 +30,7 @@ import static kr.ac.kmu.Capstone.OpenApi.OpenApiInfo.OpenApiServiceKey.SERVICE_K
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/user-service/api")
 public class SubwayController {
     private final SubwayTimeApiService subwayTimeApiService;
     private final SubwayNearBusStopService subwayNearBusStopService;

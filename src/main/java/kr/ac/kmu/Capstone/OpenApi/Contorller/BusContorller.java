@@ -35,7 +35,7 @@ import static kr.ac.kmu.Capstone.OpenApi.OpenApiInfo.OpenApiServiceKey.SERVICE_K
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/user-service/api")
 public class BusContorller {
     private final BusApiService busApiService;
     private final BusRouteAcctoSpcifySttnService busRouteAcctoSpcifySttnService;
