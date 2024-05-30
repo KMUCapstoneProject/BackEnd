@@ -12,3 +12,19 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate # 올리는 경우는 validate # 밀고 새로 하고 싶으면 create # 새로운 것 업데이트는 update
+  application:
+    name: location-service
+
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    hostname: 101.79.8.193
