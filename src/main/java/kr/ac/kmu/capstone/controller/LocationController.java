@@ -21,6 +21,11 @@ public class LocationController {
     @Autowired
     private LocationService locationService;
 
+    @GetMapping("/hello")
+    public String helloTest() {
+        return "location hello test";
+    }
+
 
     @GetMapping("/find")
     public ResponseEntity<String> getFindPath(
