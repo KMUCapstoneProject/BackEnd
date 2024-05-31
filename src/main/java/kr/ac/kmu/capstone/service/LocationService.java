@@ -190,7 +190,7 @@ public class LocationService {
 
             System.out.println("success");
         }
-    }
+    };
 
     @Transactional
     public void createStatus(StatusDto statusDto) {
@@ -217,7 +217,28 @@ public class LocationService {
             }
             System.out.println("success");
         }
-    }
+    };
+    @Transactional
+    public void createStatusSolo(StatusDto statusDto) {
+        try (Session session = driver.session()) {
+            //MATCH (a:point {name: '본관_A'}), (b:point {name: '본관12_A'})
+            //   CREATE (a)-[r:status {value: 'road', weight: 100}]->(b);
+            String query1 = "MATCH (a:point {name: '"+ statusDto.getStart_name() + "'}), (b:point {name: '" + statusDto.getEnd_name() + "'}) "+
+                    "CREATE (a)-[r:status {value: '"+ statusDto.getValue() + "', weight: "+ statusDto.getWeight() +"}]->(b);" ;
+
+            System.out.println(query1);
+            session.run(query1);
+            if(!statusDto.getValue().equals("stair")) {
+                String query3 = "MATCH (a:point {name: '"+ statusDto.getStart_name() + "_A'}), (b:point {name: '" + statusDto.getEnd_name() + "_A'}) "+
+                        "CREATE (a)-[r:status {value: '"+ statusDto.getValue() + "', weight: "+ statusDto.getWeight() +"}]->(b);" ;
+
+                System.out.println(query3);
+                session.run(query3);
+            }
+            System.out.println("success");
+        }
+    };
+
     @Transactional
     public void deleteNode(String name) {
         try (Session session = driver.session()) {

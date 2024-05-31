@@ -26,7 +26,6 @@ public class LocationController {
         return "location hello test";
     }
 
-
     @GetMapping("/find")
     public ResponseEntity<String> getFindPath(
             @RequestParam String start_name,
@@ -151,6 +150,24 @@ public class LocationController {
         statusDto.setWeight(weight);
 
         locationService.createStatus(statusDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/create_status_solo")
+    public ResponseEntity<Void> postCreateStatusSolo(
+            @RequestParam String start_name,
+            @RequestParam String end_name,
+            @RequestParam String value,
+            @RequestParam double weight
+    ) {
+
+        StatusDto statusDto = new StatusDto();
+        statusDto.setStart_name(start_name);
+        statusDto.setEnd_name(end_name);
+        statusDto.setValue(value);
+        statusDto.setWeight(weight);
+
+        locationService.createStatusSolo(statusDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
