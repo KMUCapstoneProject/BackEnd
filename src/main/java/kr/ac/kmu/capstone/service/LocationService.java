@@ -191,7 +191,7 @@ public class LocationService {
             System.out.println("success");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error deleting node", e);
+            throw new RuntimeException("Error creating node", e);
         }
     }
 
@@ -221,7 +221,7 @@ public class LocationService {
             System.out.println("success");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error deleting node", e);
+            throw new RuntimeException("Error creating status", e);
         }
     }
 
@@ -245,7 +245,7 @@ public class LocationService {
             System.out.println("success");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error deleting node", e);
+            throw new RuntimeException("Error creating status solo", e);
         }
     }
 
@@ -276,7 +276,7 @@ public class LocationService {
             System.out.println("success");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Error deleting node", e);
+            throw new RuntimeException("Error deleting Status", e);
         }
     }
 }
