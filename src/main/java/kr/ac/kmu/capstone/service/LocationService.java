@@ -189,8 +189,11 @@ public class LocationService {
             session.run(query2);
 
             System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting node", e);
         }
-    };
+    }
 
     @Transactional
     public void createStatus(StatusDto statusDto) {
@@ -216,8 +219,12 @@ public class LocationService {
                 session.run(query4);
             }
             System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting node", e);
         }
-    };
+    }
+
     @Transactional
     public void createStatusSolo(StatusDto statusDto) {
         try (Session session = driver.session()) {
@@ -236,8 +243,11 @@ public class LocationService {
                 session.run(query3);
             }
             System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting node", e);
         }
-    };
+    }
 
     @Transactional
     public void deleteNode(String name) {
@@ -249,8 +259,11 @@ public class LocationService {
             session.run(query1);
             session.run(query2);
             System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting node", e);
         }
-    };
+    }
 
     @Transactional
     public void deleteStatus(String start_name, String end_name) {
@@ -261,6 +274,9 @@ public class LocationService {
             session.run(query1);
             session.run(query2);
             System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error deleting node", e);
         }
-    };
+    }
 }
