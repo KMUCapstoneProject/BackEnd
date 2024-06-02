@@ -22,4 +22,7 @@ public class TimeTableResponseDto {
     private String lectureNum;
     private String lectureName;
 
+    public LocalTime getStarttime() {
+        return starttime;
+    }
 }
