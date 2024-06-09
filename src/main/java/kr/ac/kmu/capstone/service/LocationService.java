@@ -1,5 +1,6 @@
 package kr.ac.kmu.capstone.service;
 
+import kr.ac.kmu.capstone.dto.location.DijkstraResultDto;
 import kr.ac.kmu.capstone.dto.location.PointDto;
 import kr.ac.kmu.capstone.dto.location.StatusDto;
 import kr.ac.kmu.capstone.entity.Point;
@@ -28,7 +29,7 @@ public class LocationService {
         this.driver = driver;
     }
 
-    public Path findDijkstraPath(String start_name, String end_name) {
+    public DijkstraResultDto findDijkstraPath(String start_name, String end_name) {
         try(Session session = driver.session()) {
             String query = "MATCH(start:point {name : \'" + start_name + "\'}), (end:point {name : \'" + end_name + "\'})" +
                     " CALL apoc.algo.dijkstra(start,end,'status','weight') YIELD path,weight " +
@@ -36,12 +37,17 @@ public class LocationService {
 
             Result result = session.run(query);
             System.out.println(result); // org.neo4j.driver.internal.InternalResult@6c3f7ad5
+
             //결과 처리
             if(result.hasNext()) {
                 Record record = result.next();
                 Path path = record.get("path").asPath(); // << 경로
-                System.out.println(path);
-                return path;
+                double weight = record.get("weight").asDouble();
+
+                //System.out.println(path);
+                //System.out.println(weight);
+
+                return new DijkstraResultDto(path,weight);
             } else {
                 return null;
             }
@@ -49,7 +55,7 @@ public class LocationService {
     }
 
 
-    public Path findMyDijkstraPath(PointDto pointDto, String end_name) {
+    public DijkstraResultDto findMyDijkstraPath(PointDto pointDto, String end_name) {
         try (Session session = driver.session()) {
             // 1. 우선 나와 가장 거리가 가까운 점을 찾아온다. >> 성공
             // 2. 가장 가까운 점과 종점을 dijkstra 해서 거리를 구한다. >> 성공
@@ -83,7 +89,9 @@ public class LocationService {
                 if (dijkstraresult.hasNext()) {
                     Record dijkstraRecord = dijkstraresult.next();
                     Path path = dijkstraRecord.get("path").asPath();
-                    return path;
+                    double weight = dijkstraRecord.get("weight").asDouble();
+
+                    return new DijkstraResultDto(path,weight);
                 } else {
                 }
             }
@@ -92,7 +100,7 @@ public class LocationService {
     }
 
     //계단 없는 버전
-    public Path findMyDijkstraPath_A(PointDto pointDto, String end_name) {
+    public DijkstraResultDto findMyDijkstraPath_A(PointDto pointDto, String end_name) {
         try (Session session = driver.session()) {
             // 1. 우선 나와 가장 거리가 가까운 점을 찾아온다. >> 성공
             // 2. 가장 가까운 점과 종점을 dijkstra 해서 거리를 구한다.
@@ -118,14 +126,17 @@ public class LocationService {
                 Point point = new Point(nodeName, nodeLatitude, nodeLongitude);
 
                 String query = "MATCH(start:point {name : \'" + point.getName() + "\'}), (end:point {name : \'" + end_name + "\'})" +
-                        " CALL apoc.algo.dijkstra(start,end,'status','weight') YIELD path,weight " +
-                        "RETURN path, weight";
+                               " CALL apoc.algo.dijkstra(start,end,'status','weight') YIELD path,weight " +
+                               "RETURN path, weight";
 
                 Result dijkstraresult = session.run(query);
+
                 if (dijkstraresult.hasNext()) {
                     Record dijkstraRecord = dijkstraresult.next();
                     Path path = dijkstraRecord.get("path").asPath();
-                    return path;
+                    double weight = dijkstraRecord.get("weight").asDouble();
+
+                    return new DijkstraResultDto(path,weight);
                 } else {
                 }
             }
@@ -155,6 +166,30 @@ public class LocationService {
         }
         return locations;
     }
+
+    public List<PointDto> loadOnePoint(String name) {
+        List<PointDto> locations = new ArrayList<>();
+        String query = "Match (n) WHERE n.name = \"" + name + "\" AND NOT n.name ENDS WITH '_A' return n";
+
+        try (Session session = driver.session()) {
+            Result result = session.run(query);
+            //System.out.println(result);
+
+            while (result.hasNext()) {
+                Record record = result.next();
+                PointDto pointdto = new PointDto();
+                pointdto.setName(record.get("n").get("name").asString());
+                pointdto.setLatitude(record.get("n").get("latitude").asDouble());
+                pointdto.setLongitude(record.get("n").get("longitude").asDouble());
+
+                locations.add(pointdto);
+            }
+        }catch (ServiceUnavailableException e) {
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
 
     public List<StatusDto> loadAllStatus() {
         List<StatusDto> relationships = new ArrayList<>();

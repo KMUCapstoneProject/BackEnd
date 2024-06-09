@@ -1,5 +1,6 @@
 package kr.ac.kmu.capstone.controller;
 
+import kr.ac.kmu.capstone.dto.location.DijkstraResultDto;
 import kr.ac.kmu.capstone.dto.location.PointDto;
 import kr.ac.kmu.capstone.dto.location.StatusDto;
 import kr.ac.kmu.capstone.entity.Point;
@@ -18,6 +19,8 @@ import java.util.List;
 @RequestMapping("/location-service/location")
 public class LocationController {
 
+
+    private final double averageWalkingSpeedMpm = 83.33; // 성인 평균 걷는 속력 (m/min)
     @Autowired
     private LocationService locationService;
 
@@ -31,12 +34,23 @@ public class LocationController {
             @RequestParam String start_name,
             @RequestParam String end_name) {
 
-        Path resultPath = locationService.findDijkstraPath(start_name, end_name);
-        String test = convertPathToText(resultPath);
-
+        DijkstraResultDto resultPath = locationService.findDijkstraPath(start_name, end_name);
         if(resultPath != null) {
-            System.out.println(test);
-            return new ResponseEntity<>(test, HttpStatus.OK);
+            String PathText = convertPathToText(resultPath.getPath());
+
+            double weight = resultPath.getWeight();
+            double estimatedTimeMinutes = weight / averageWalkingSpeedMpm;
+
+            System.out.println(estimatedTimeMinutes);
+
+            int minutes = (int) estimatedTimeMinutes;
+            int seconds = (int) ((estimatedTimeMinutes - minutes) * 60);
+
+            String resultText = String.format("%s#%.2f/%d:%d", PathText, weight, minutes, seconds);
+            System.out.println(resultText);
+
+
+            return new ResponseEntity<>(resultText, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -50,12 +64,25 @@ public class LocationController {
         String start_name_A = start_name + "_A";
         String end_name_A = end_name + "_A";
 
-        Path resultPath = locationService.findDijkstraPath(start_name_A, end_name_A);
-        String test = convertPathToText(resultPath);
+        DijkstraResultDto resultPath = locationService.findDijkstraPath(start_name_A, end_name_A);
+
 
         if(resultPath != null) {
-            System.out.println(test);
-            return new ResponseEntity<>(test, HttpStatus.OK);
+            String PathText = convertPathToText(resultPath.getPath());
+
+            double weight = resultPath.getWeight();
+            double estimatedTimeMinutes = weight / averageWalkingSpeedMpm;
+
+            System.out.println(estimatedTimeMinutes);
+
+            int minutes = (int) estimatedTimeMinutes;
+            int seconds = (int) ((estimatedTimeMinutes - minutes) * 60);
+
+            String resultText = String.format("%s#%.2f/%d:%d", PathText, weight, minutes, seconds);
+            System.out.println(resultText);
+
+
+            return new ResponseEntity<>(resultText, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -73,13 +100,24 @@ public class LocationController {
         pointDto.setLatitude(start_pos_latitude);
         pointDto.setLongitude(start_pos_longitude);
 
-
-        Path resultPath = locationService.findMyDijkstraPath(pointDto, end_name);
-        String test = convertPathToText(resultPath);
+        DijkstraResultDto resultPath = locationService.findMyDijkstraPath(pointDto, end_name);
 
         if(resultPath != null) {
-            System.out.println(test);
-            return new ResponseEntity<>(test, HttpStatus.OK);
+            String PathText = convertPathToText(resultPath.getPath());
+
+            double weight = resultPath.getWeight();
+            double estimatedTimeMinutes = weight / averageWalkingSpeedMpm;
+
+            System.out.println(estimatedTimeMinutes);
+
+            int minutes = (int) estimatedTimeMinutes;
+            int seconds = (int) ((estimatedTimeMinutes - minutes) * 60);
+
+            String resultText = String.format("%s#%.2f/%d:%d", PathText, weight, minutes, seconds);
+            System.out.println(resultText);
+
+
+            return new ResponseEntity<>(resultText, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -98,18 +136,42 @@ public class LocationController {
         pointDto.setLongitude(start_pos_longitude);
 
         String end_name_A = end_name + "_A";
-        Path resultPath = locationService.findMyDijkstraPath_A(pointDto, end_name_A);
-        String test = convertPathToText(resultPath);
+        DijkstraResultDto resultPath = locationService.findMyDijkstraPath_A(pointDto, end_name_A);
+
         if(resultPath != null) {
-            return new ResponseEntity<>(test, HttpStatus.OK);
+            String PathText = convertPathToText(resultPath.getPath());
+
+            double weight = resultPath.getWeight();
+            double estimatedTimeMinutes = weight / averageWalkingSpeedMpm;
+
+            System.out.println(estimatedTimeMinutes);
+
+            int minutes = (int) estimatedTimeMinutes;
+            int seconds = (int) ((estimatedTimeMinutes - minutes) * 60);
+
+            String resultText = String.format("%s#%.2f/%d:%d", PathText, weight, minutes, seconds);
+            System.out.println(resultText);
+
+
+            return new ResponseEntity<>(resultText, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
     @GetMapping("/loadAll_Node")
     public ResponseEntity<List<PointDto>> getLoadPoint() {
 
         List<PointDto> locations = locationService.loadAllPoint();
+        return new ResponseEntity<>(locations, HttpStatus.OK);
+    }
+
+    @GetMapping("/load_Node")
+    public ResponseEntity<List<PointDto>> getLoadNode(
+            @RequestParam String name
+    ) {
+
+        List<PointDto> locations = locationService.loadOnePoint(name);
         return new ResponseEntity<>(locations, HttpStatus.OK);
     }
     @GetMapping("/loadAll_Status")
